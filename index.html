@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8F4;
+    --surface: #FFFFFF;
+    --charcoal: #2B2B28;
+    --muted: #8A877E;
+    --line: #E8E4DC;
+    --clay: #C1654A;
+    --clay-soft: #F6E8E2;
+    --teal: #3E7C77;
+    --teal-soft: #E4EFEE;
+    --slate: #5B6B8A;
+    --slate-soft: #E8EBF2;
+    --grey-soft: #F0EEE8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Albert Sans', sans-serif;
+    background: var(--bg);
+    color: var(--charcoal);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 64px 24px;
+  }
+
+  .app { width: 100%; max-width: 720px; }
+
+  header { margin-bottom: 20px; }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 8px;
+  }
+
+  h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.01em; }
+  .count { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .count .overdue-note { color: var(--clay); font-weight: 600; }
+
+  /* ---------- Scope ---------- */
+  .scope {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px;
+    margin-bottom: 20px;
+    gap: 2px;
+  }
+
+  .scope button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .scope button.active-work { background: var(--slate); color: #fff; }
+  .scope button.active-private { background: var(--clay); color: #fff; }
+  .scope button.active-both { background: var(--charcoal); color: #fff; }
+
+  /* ---------- Composer ---------- */
+  .composer {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 20px;
+  }
+
+  .input-row { display: flex; gap: 10px; }
+
+  .input-row input {
+    flex: 1;
+    min-width: 0;
+    font-family: inherit;
+    font-size: 16px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--charcoal);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .input-row input:focus { border-color: var(--teal); }
+  .input-row input::placeholder { color: var(--muted); }
+
+  .input-row > button {
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 0 22px;
+    border: none;
+    border-radius: 10px;
+    background: var(--charcoal);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .input-row > button:hover { background: #45453f; }
+
+  .composer-flags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .composer-flags .hint { font-size: 12px; color: var(--muted); margin-right: 4px; }
+  .composer-flags .sep { width: 1px; height: 18px; background: var(--line); margin: 0 4px; }
+
+  .composer-target {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  button:focus-visible, .grip:focus-visible, input:focus-visible {
+    outline: 2px solid var(--slate);
+    outline-offset: 2px;
+  }
+
+  .flag {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .flag.u.on { background: var(--clay-soft); border-color: var(--clay); color: var(--clay); }
+  .flag.i.on { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); }
+  .flag.f.on { background: var(--slate-soft); border-color: var(--slate); color: var(--slate); }
+  .flag.f.overdue { background: var(--clay-soft); border-color: var(--clay); color: var(--clay); }
+  .flag.f.today { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); }
+  .flag.cw.on { background: var(--slate); border-color: var(--slate); color: #fff; }
+  .flag.cp.on { background: var(--clay); border-color: var(--clay); color: #fff; }
+  .flag.st.on { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+
+  /* ---------- Follow-up editor ---------- */
+  .date-pop { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .mode-toggle { display: flex; gap: 4px; }
+
+  .mode-toggle button {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .mode-toggle button.active { background: var(--slate); border-color: var(--slate); color: #fff; }
+
+  .date-pop input[type="date"], .date-pop input[type="time"] {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 6px 9px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--charcoal);
+  }
+
+  .date-pop .clear-date {
+    font-family: inherit;
+    font-size: 12px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px 4px;
+  }
+
+  .date-pop .clear-date:hover { color: var(--clay); }
+
+  .quick-dates { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .quick-dates button {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--charcoal);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .quick-dates button:hover { border-color: var(--slate); }
+  .quick-dates button small { color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .pills button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    min-height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .pills button.active {
+    background: var(--charcoal);
+    border-color: var(--charcoal);
+    color: #fff;
+  }
+
+  .pills button .dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--clay);
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+
+  /* ---------- Task rows ---------- */
+  ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+  .task {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    border-left-width: 4px;
+    transition: border-color 0.15s;
+    flex-wrap: wrap;
+  }
+
+  .task.ctx-work { border-left-color: var(--slate); }
+  .task.ctx-private { border-left-color: var(--clay); }
+  .task:hover { border-color: var(--slate); }
+  .task.ctx-private:hover { border-color: var(--clay); }
+
+  .ctx-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .ctx-tag.w { background: var(--slate-soft); color: var(--slate); }
+  .ctx-tag.p { background: var(--clay-soft); color: var(--clay); }
+
+  .check {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--line);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+    transition: all 0.15s;
+  }
+
+  .task.done .check, .q-task.done .check { background: var(--teal); border-color: var(--teal); }
+  .check svg { opacity: 0; transition: opacity 0.15s; }
+  .task.done .check svg, .q-task.done .check svg { opacity: 1; }
+
+  .task .text { flex: 1; font-size: 15px; min-width: 0; overflow-wrap: break-word; }
+  .task.done .text, .q-task.done .text { color: var(--muted); text-decoration: line-through; }
+
+  .flags { display: flex; gap: 5px; flex-shrink: 0; flex-wrap: wrap; }
+  .flags .flag { font-size: 11px; padding: 5px 10px; }
+
+  .task .del, .r-card .del {
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+  }
+
+  .task:hover .del, .task .del:focus-visible,
+  .r-card:hover .del, .r-card .del:focus-visible { opacity: 1; }
+  .task .del:hover, .r-card .del:hover { color: var(--clay); }
+
+  .task .date-pop, .q-task .date-pop { width: 100%; padding-left: 34px; }
+
+  /* ---------- Matrix view ---------- */
+  .matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .quadrant {
+    border-radius: 14px;
+    padding: 16px;
+    min-height: 140px;
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+  }
+
+  .quadrant.q-do { background: var(--clay-soft); }
+  .quadrant.q-schedule { background: var(--teal-soft); }
+  .quadrant.q-delegate { background: var(--slate-soft); }
+  .quadrant.q-eliminate { background: var(--grey-soft); }
+  .quadrant.drop-target, .stage-zone.drop-target { border-color: var(--charcoal) !important; }
+
+  .q-head { margin-bottom: 4px; }
+  .q-title { font-size: 14px; font-weight: 700; }
+  .q-do .q-title { color: var(--clay); }
+  .q-schedule .q-title { color: var(--teal); }
+  .q-delegate .q-title { color: var(--slate); }
+  .q-eliminate .q-title { color: var(--muted); }
+
+  .q-sub { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+
+  .q-task {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border-radius: 9px;
+    border-left: 4px solid transparent;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    flex-wrap: wrap;
+  }
+
+  .q-task.ctx-work { border-left-color: var(--slate); }
+  .q-task.ctx-private { border-left-color: var(--clay); }
+
+  .q-task .check { width: 18px; height: 18px; }
+  .q-task .text { flex: 1; min-width: 0; overflow-wrap: break-word; }
+  .q-task .flag.f { font-size: 10px; padding: 4px 8px; }
+
+  .grip {
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: grab;
+    padding: 6px 4px;
+    margin: -6px 0;
+    flex-shrink: 0;
+    border-radius: 6px;
+    touch-action: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .grip:active { cursor: grabbing; }
+
+  .q-empty { font-size: 13px; color: var(--muted); font-style: italic; }
+
+  .unsorted { margin-top: 20px; }
+  .unsorted h2 { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+
+  .drag-ghost {
+    position: fixed;
+    z-index: 100;
+    pointer-events: none;
+    background: var(--surface);
+    border: 1px solid var(--slate);
+    border-radius: 9px;
+    padding: 8px 14px;
+    font-size: 14px;
+    box-shadow: 0 6px 20px rgba(43,43,40,0.15);
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dragging-source { opacity: 0.35; }
+
+  /* ---------- Follow-ups view ---------- */
+  .fu-group { margin-bottom: 24px; }
+  .fu-group h2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: var(--muted);
+  }
+  .fu-group.overdue h2 { color: var(--clay); }
+  .fu-group.today h2 { color: var(--teal); }
+  .fu-group.nudge h2 { color: var(--slate); }
+  .fu-note { font-size: 13px; color: var(--muted); margin: -4px 0 10px; }
+
+  /* ---------- Radar view ---------- */
+  .radar-summary { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+  .stage-zone {
+    border: 2px dashed var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
+    transition: border-color 0.15s;
+  }
+
+  .stage-zone h2 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .stage-zone .stage-sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .stage-zone .q-empty { margin-bottom: 2px; }
+
+  .r-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left-width: 4px;
+    border-radius: 11px;
+    padding: 11px 13px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    transition: opacity 0.2s;
+  }
+
+  .r-card.ctx-work { border-left-color: var(--slate); }
+  .r-card.ctx-private { border-left-color: var(--clay); }
+  .r-card.aging { opacity: 0.85; }
+  .r-card.stale { opacity: 0.65; }
+
+  .r-card .text { flex: 1; font-size: 15px; min-width: 0; overflow-wrap: break-word; }
+
+  .r-age { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .r-card.stale .r-age { color: var(--clay); font-weight: 600; }
+
+  .r-actions { display: flex; gap: 5px; flex-shrink: 0; align-items: center; }
+
+  .r-btn {
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 6px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .r-btn.touch:hover { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); }
+  .r-btn.promote:hover { background: var(--slate-soft); border-color: var(--slate); color: var(--slate); }
+
+  .r-checkin {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .r-checkin input {
+    flex: 1;
+    min-width: 0;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 11px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--bg);
+    outline: none;
+  }
+
+  .r-checkin input:focus { border-color: var(--teal); }
+
+  .r-checkin button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 9px;
+    background: var(--teal);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .r-log { width: 100%; font-size: 13px; color: var(--muted); }
+  .r-log .r-log-entry { padding: 4px 0; border-top: 1px dashed var(--line); }
+  .r-log .r-log-entry b { color: var(--charcoal); font-weight: 600; }
+
+  .r-history {
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .empty { text-align: center; padding: 48px 0; color: var(--muted); font-size: 15px; }
+
+  .data-bar {
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+
+  .data-bar button {
+    font-family: inherit;
+    font-size: 12px;
+    border: none;
+    background: none;
+    color: var(--slate);
+    cursor: pointer;
+    padding: 4px 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .data-bar button:hover { color: var(--charcoal); }
+
+  .dbx-setup { border-top: none; margin-top: 6px; padding-top: 0; }
+
+  .dbx-setup input {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--charcoal);
+    outline: none;
+    min-width: 180px;
+  }
+
+  .dbx-setup input:focus { border-color: var(--teal); }
+
+  /* ---------- Responsive & touch ---------- */
+  @media (max-width: 600px) {
+    body { padding: 32px 16px; }
+    h1 { font-size: 26px; }
+    .matrix { grid-template-columns: 1fr; }
+    .task .flags { order: 3; width: 100%; padding-left: 34px; }
+    .r-actions { width: 100%; justify-content: flex-end; }
+  }
+
+  @media (hover: none) {
+    .task { padding: 16px 14px; }
+    .task .del, .r-card .del { opacity: 1; padding: 10px 12px; margin: -10px -6px -10px 0; }
+    .flags .flag { padding: 7px 12px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="eyebrow">Today</div>
+    <h1>Tasks</h1>
+    <div class="count" id="count"></div>
+  </header>
+
+  <div class="scope" id="scope" role="tablist" aria-label="Work or private tasks">
+    <button data-scope="work" class="active-work">Work</button>
+    <button data-scope="private">Private</button>
+    <button data-scope="both">Both</button>
+  </div>
+
+  <div class="composer">
+    <div class="input-row">
+      <input id="input" type="text" placeholder="Add a task…" aria-label="New task">
+      <button id="add">Add</button>
+    </div>
+    <div class="composer-flags">
+      <button class="flag cw" id="newWork" aria-pressed="true">Work</button>
+      <button class="flag cp" id="newPrivate" aria-pressed="false">Private</button>
+      <span class="sep" id="taskFlagsSep"></span>
+      <button class="flag u" id="newUrgent" aria-pressed="false">Urgent</button>
+      <button class="flag i" id="newImportant" aria-pressed="false">Important</button>
+      <button class="flag f" id="newFollowBtn" aria-pressed="false">Follow up</button>
+      <span class="sep" id="stageFlagsSep" hidden></span>
+      <button class="flag st" id="stWatching" hidden>Watching</button>
+      <button class="flag st" id="stSimmering" hidden>Simmering</button>
+      <button class="flag st" id="stWinding" hidden>Winding down</button>
+      <span class="composer-target" id="composerTarget"></span>
+    </div>
+    <div class="composer-flags" id="newFollowPop" hidden></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="pills" id="views" role="tablist" aria-label="View">
+      <button data-view="list" class="active">List</button>
+      <button data-view="matrix">Matrix</button>
+      <button data-view="followups" id="fuPill">Follow-ups</button>
+      <button data-view="radar">Radar</button>
+    </div>
+    <div class="pills" id="filters" role="tablist" aria-label="Filter tasks">
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="active">Active</button>
+      <button data-filter="done">Done</button>
+    </div>
+  </div>
+
+  <div id="viewList"><ul id="list"></ul></div>
+
+  <div id="viewMatrix" hidden>
+    <div class="matrix" id="matrixGrid"></div>
+    <div class="unsorted" id="unsortedWrap" hidden>
+      <h2>Unsorted — drag into a quadrant</h2>
+      <ul id="unsortedList"></ul>
+    </div>
+  </div>
+
+  <div id="viewFollowups" hidden></div>
+
+  <div id="viewRadar" hidden></div>
+
+  <div class="empty" id="empty" hidden></div>
+
+  <div class="data-bar">
+    <span id="storageStatus"></span>
+    <button id="dbxBtn">Connect Dropbox</button>
+    <button id="dbxDisconnect" hidden>Disconnect Dropbox</button>
+    <button id="exportBtn">Export backup</button>
+    <button id="importBtn">Import backup</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+  </div>
+  <div class="data-bar dbx-setup" id="dbxSetup" hidden>
+    <span>Paste your Dropbox App key (one-time, from the Dropbox App Console):</span>
+    <input type="text" id="dbxKeyInput" placeholder="App key" aria-label="Dropbox app key">
+    <button id="dbxKeySave">Save &amp; connect</button>
+  </div>
+</div>
+
+<script>
+  let tasks = [];
+  let radar = [];
+  let filter = 'all';
+  let view = 'list';
+  let scope = 'work';
+  let nextId = 1;
+  let newUrgent = false, newImportant = false;
+  let newContext = 'work';
+  let newFollow = null;
+  let newStage = 'watching';
+  let openDateEditor = null;
+  let openCheckin = null;      // radar item id with check-in form open
+  let openHistory = null;      // radar item id with history expanded
+
+  const QUADRANTS = [
+    { key: 'do',        title: 'Do now',    sub: 'Urgent + important',           urgent: true,  important: true  },
+    { key: 'schedule',  title: 'Schedule',  sub: 'Important, not urgent',        urgent: false, important: true  },
+    { key: 'delegate',  title: 'Delegate',  sub: 'Urgent, not important',        urgent: true,  important: false },
+    { key: 'eliminate', title: 'Eliminate', sub: 'Neither urgent nor important', urgent: false, important: false }
+  ];
+
+  const STAGES = [
+    { key: 'watching',  title: 'Watching',     sub: 'On the radar, nothing to do yet' },
+    { key: 'simmering', title: 'Simmering',    sub: 'Developing \u2014 may need action before long' },
+    { key: 'winding',   title: 'Winding down', sub: 'Letting go \u2014 confirm and close out' }
+  ];
+
+  const targetName = (u, i) => u && i ? 'Do now' : i ? 'Schedule' : u ? 'Delegate' : '';
+
+  /* ---------- Date helpers ---------- */
+  function toIso(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  const todayStr = () => toIso(new Date());
+
+  function fromIso(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function fmtDate(iso) {
+    return fromIso(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  }
+
+  function addDays(n) {
+    const d = new Date();
+    d.setDate(d.getDate() + n);
+    return toIso(d);
+  }
+
+  const isWeekend = iso => [0, 6].includes(fromIso(iso).getDay());
+
+  function rollToMonday(iso) {
+    const d = fromIso(iso);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    return toIso(d);
+  }
+
+  function dueMoment(f) {
+    const d = fromIso(f.date);
+    if (f.time) {
+      const [hh, mm] = f.time.split(':').map(Number);
+      d.setHours(hh, mm, 0, 0);
+    } else {
+      d.setHours(23, 59, 59, 0);
+    }
+    return d;
+  }
+
+  function dayDiff(iso) {
+    const target = fromIso(iso);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((target - today) / 86400000);
+  }
+
+  function workDayDiff(iso) {
+    const today = fromIso(todayStr());
+    const target = fromIso(iso);
+    if (+today === +target) return 0;
+    const sign = target > today ? 1 : -1;
+    let count = 0;
+    const cur = new Date(today);
+    while (+cur !== +target) {
+      cur.setDate(cur.getDate() + sign);
+      const dow = cur.getDay();
+      if (dow !== 0 && dow !== 6) count += sign;
+    }
+    return count;
+  }
+
+  function thisFriday() {
+    const d = new Date();
+    const dow = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() + (4 - dow));
+    return toIso(d);
+  }
+
+  function nextFriday() {
+    const d = fromIso(thisFriday());
+    d.setDate(d.getDate() + 7);
+    return toIso(d);
+  }
+
+  function thisSunday() {
+    const d = new Date();
+    const dow = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() + (6 - dow));
+    return toIso(d);
+  }
+
+  function nextSunday() {
+    const d = fromIso(thisSunday());
+    d.setDate(d.getDate() + 7);
+    return toIso(d);
+  }
+
+  const weekEndFor = ctx => ctx === 'work' ? thisFriday() : thisSunday();
+
+  function quickDateOptions(ctx) {
+    let opts;
+    if (ctx === 'work') {
+      const t1 = rollToMonday(addDays(1));
+      opts = [
+        { label: dayDiff(t1) === 1 ? 'Tomorrow' : 'Monday', date: t1 },
+        { label: 'End of week', date: thisFriday() },
+        { label: 'One week from now', date: rollToMonday(addDays(7)) },
+        { label: 'End of following week', date: nextFriday() }
+      ];
+    } else {
+      opts = [
+        { label: 'Tomorrow', date: addDays(1) },
+        { label: 'End of week', date: thisSunday() },
+        { label: 'One week from now', date: addDays(7) },
+        { label: 'End of following week', date: nextSunday() }
+      ];
+    }
+    const today = todayStr();
+    const byDate = new Map();
+    opts.forEach(o => {
+      if (o.date <= today) return;
+      if (byDate.has(o.date)) byDate.get(o.date).label += ' \u00b7 ' + o.label;
+      else byDate.set(o.date, { ...o });
+    });
+    return [...byDate.values()];
+  }
+
+  function remainingLabel(iso, ctx) {
+    if (ctx === 'work') {
+      const wd = workDayDiff(iso);
+      return wd === 1 ? '1 wd' : wd + ' wd';
+    }
+    const dd = dayDiff(iso);
+    return dd === 1 ? '1 d' : dd + ' d';
+  }
+
+  function countdownText(f, ctx) {
+    if (f.time) {
+      const diffMin = Math.round((dueMoment(f) - new Date()) / 60000);
+      const abs = Math.abs(diffMin);
+      let span;
+      if (abs < 60) span = abs + ' min';
+      else if (abs < 1440) span = (Math.floor(abs / 60) + ' h ' + (abs % 60 > 0 ? (abs % 60) + ' min' : '')).trim();
+      else span = Math.floor(abs / 1440) + ' d';
+      return diffMin >= 0 ? 'in ' + span : span + ' over';
+    }
+    const dd = dayDiff(f.date);
+    if (dd === 0) return 'today';
+    if (ctx === 'work') {
+      const wd = workDayDiff(f.date);
+      if (dd > 0) return dd === 1 ? 'tomorrow' : 'in ' + wd + ' wd';
+      return (-wd) + ' wd over';
+    }
+    if (dd === 1) return 'tomorrow';
+    if (dd > 1) return 'in ' + dd + ' d';
+    return (-dd) + ' d over';
+  }
+
+  function followStatus(t) {
+    if (!t.followUp || t.done) return null;
+    if (dueMoment(t.followUp) < new Date()) return 'overdue';
+    if (t.followUp.date === todayStr()) return 'today';
+    return 'upcoming';
+  }
+
+  function fmtChip(f, ctx) {
+    const when = f.time
+      ? (f.date === todayStr() ? f.time : fmtDate(f.date) + ' ' + f.time)
+      : fmtDate(f.date);
+    return when + ' \u00b7 ' + countdownText(f, ctx);
+  }
+
+  /* ---------- Radar helpers ---------- */
+  const lastTouch = r => r.log.length ? r.log[r.log.length - 1].date : r.created;
+
+  function touchAge(r) {
+    return -dayDiff(lastTouch(r)); // days since last touch
+  }
+
+  function ageLabel(r) {
+    const a = touchAge(r);
+    if (a === 0) return 'touched today';
+    if (a === 1) return 'touched yesterday';
+    return 'touched ' + a + ' d ago';
+  }
+
+  const freshness = r => {
+    const a = touchAge(r);
+    return a < 7 ? 'fresh' : a < 21 ? 'aging' : 'stale';
+  };
+
+  /* ---------- Elements ---------- */
+  const input = document.getElementById('input');
+  const list = document.getElementById('list');
+  const count = document.getElementById('count');
+  const empty = document.getElementById('empty');
+  const matrixGrid = document.getElementById('matrixGrid');
+  const unsortedWrap = document.getElementById('unsortedWrap');
+  const unsortedList = document.getElementById('unsortedList');
+  const viewFollowups = document.getElementById('viewFollowups');
+  const viewRadar = document.getElementById('viewRadar');
+  const composerTarget = document.getElementById('composerTarget');
+  const btnNewU = document.getElementById('newUrgent');
+  const btnNewI = document.getElementById('newImportant');
+  const btnNewF = document.getElementById('newFollowBtn');
+  const btnNewW = document.getElementById('newWork');
+  const btnNewP = document.getElementById('newPrivate');
+  const newFollowPop = document.getElementById('newFollowPop');
+  const fuPill = document.getElementById('fuPill');
+  const filtersEl = document.getElementById('filters');
+  const stageBtns = {
+    watching: document.getElementById('stWatching'),
+    simmering: document.getElementById('stSimmering'),
+    winding: document.getElementById('stWinding')
+  };
+
+  document.getElementById('add').addEventListener('click', addEntry);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); });
+
+  btnNewU.addEventListener('click', () => { newUrgent = !newUrgent; syncComposer(); });
+  btnNewI.addEventListener('click', () => { newImportant = !newImportant; syncComposer(); });
+  btnNewW.addEventListener('click', () => setNewContext('work'));
+  btnNewP.addEventListener('click', () => setNewContext('private'));
+
+  Object.entries(stageBtns).forEach(([key, btn]) =>
+    btn.addEventListener('click', () => { newStage = key; syncComposer(); }));
+
+  function setNewContext(ctx) {
+    if (newContext !== ctx) {
+      newContext = ctx;
+      if (newFollow && !newFollow.time && ctx === 'work' && isWeekend(newFollow.date)) {
+        newFollow = { date: rollToMonday(newFollow.date), time: null };
+      }
+      newFollowPop.hidden = true;
+    }
+    syncComposer();
+  }
+
+  btnNewF.addEventListener('click', () => {
+    if (newFollowPop.hidden) {
+      newFollowPop.hidden = false;
+      newFollowPop.innerHTML = '';
+      newFollowPop.appendChild(buildFollowEditor(newFollow, newContext, f => {
+        newFollow = f;
+        newFollowPop.hidden = true;
+        syncComposer();
+      }));
+    } else {
+      newFollowPop.hidden = true;
+    }
+  });
+
+  function syncComposer() {
+    const radarMode = view === 'radar';
+
+    btnNewW.classList.toggle('on', newContext === 'work');
+    btnNewP.classList.toggle('on', newContext === 'private');
+    btnNewW.setAttribute('aria-pressed', newContext === 'work');
+    btnNewP.setAttribute('aria-pressed', newContext === 'private');
+
+    // task-only chips
+    [btnNewU, btnNewI, btnNewF].forEach(b => b.hidden = radarMode);
+    document.getElementById('taskFlagsSep').hidden = radarMode;
+    if (radarMode) newFollowPop.hidden = true;
+
+    // radar-only chips
+    document.getElementById('stageFlagsSep').hidden = !radarMode;
+    Object.entries(stageBtns).forEach(([key, btn]) => {
+      btn.hidden = !radarMode;
+      btn.classList.toggle('on', newStage === key);
+      btn.setAttribute('aria-pressed', newStage === key);
+    });
+
+    input.placeholder = radarMode ? 'Add to radar\u2026' : 'Add a task\u2026';
+
+    btnNewU.classList.toggle('on', newUrgent);
+    btnNewI.classList.toggle('on', newImportant);
+    btnNewU.setAttribute('aria-pressed', newUrgent);
+    btnNewI.setAttribute('aria-pressed', newImportant);
+    btnNewF.classList.toggle('on', !!newFollow);
+    btnNewF.setAttribute('aria-pressed', !!newFollow);
+    btnNewF.textContent = newFollow ? 'Follow up ' + fmtChip(newFollow, newContext) : 'Follow up';
+
+    const name = targetName(newUrgent, newImportant);
+    composerTarget.textContent = radarMode ? '' : (name ? '\u2192 ' + name : '');
+  }
+
+  /* ---------- Follow-up editor ---------- */
+  function buildFollowEditor(current, ctx, onDone) {
+    const pop = document.createElement('div');
+    pop.className = 'date-pop';
+
+    let mode = current && !current.time ? 'date' : 'today';
+
+    const toggle = document.createElement('div');
+    toggle.className = 'mode-toggle';
+    const bToday = document.createElement('button');
+    bToday.textContent = 'Later today';
+    const bDate = document.createElement('button');
+    bDate.textContent = 'Pick a date';
+    toggle.append(bToday, bDate);
+
+    const timeInput = document.createElement('input');
+    timeInput.type = 'time';
+    timeInput.setAttribute('aria-label', 'Follow-up time today');
+    timeInput.value = current && current.time ? current.time : '';
+
+    const quick = document.createElement('div');
+    quick.className = 'quick-dates';
+    quickDateOptions(ctx).forEach(o => {
+      const b = document.createElement('button');
+      b.appendChild(document.createTextNode(o.label));
+      const small = document.createElement('small');
+      small.textContent = fmtDate(o.date) + ' \u00b7 ' + remainingLabel(o.date, ctx);
+      b.appendChild(small);
+      b.addEventListener('click', () => onDone({ date: o.date, time: null }));
+      quick.appendChild(b);
+    });
+
+    const dateInput = document.createElement('input');
+    dateInput.type = 'date';
+    dateInput.setAttribute('aria-label', 'Custom follow-up date');
+    dateInput.value = current && !current.time ? current.date : '';
+
+    const clear = document.createElement('button');
+    clear.className = 'clear-date';
+    clear.textContent = 'Clear';
+
+    function setMode(m, openPicker) {
+      mode = m;
+      bToday.classList.toggle('active', m === 'today');
+      bDate.classList.toggle('active', m === 'date');
+      timeInput.style.display = m === 'today' ? '' : 'none';
+      quick.style.display = m === 'date' ? '' : 'none';
+      dateInput.style.display = m === 'date' ? '' : 'none';
+      if (openPicker && m === 'today') {
+        setTimeout(() => {
+          timeInput.focus();
+          if (timeInput.showPicker) { try { timeInput.showPicker(); } catch(e) {} }
+        }, 0);
+      }
+    }
+
+    bToday.addEventListener('click', () => setMode('today', true));
+    bDate.addEventListener('click', () => setMode('date', true));
+
+    timeInput.addEventListener('change', () => {
+      if (timeInput.value) onDone({ date: todayStr(), time: timeInput.value });
+    });
+
+    dateInput.addEventListener('change', () => {
+      if (!dateInput.value) return;
+      let date = dateInput.value;
+      if (ctx === 'work' && isWeekend(date)) date = rollToMonday(date);
+      onDone({ date, time: null });
+    });
+
+    clear.addEventListener('click', () => onDone(null));
+
+    pop.append(toggle, timeInput, quick, dateInput, clear);
+    setMode(mode, false);
+    return pop;
+  }
+
+  /* ---------- Scope, views, filters ---------- */
+  document.querySelectorAll('#scope button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      scope = btn.dataset.scope;
+      document.querySelectorAll('#scope button').forEach(b => {
+        b.className = '';
+        if (b === btn) b.className = 'active-' + scope;
+      });
+      if (scope !== 'both') setNewContext(scope);
+      render();
+    });
+  });
+
+  document.querySelectorAll('#views button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      view = btn.dataset.view;
+      document.querySelectorAll('#views button').forEach(b => b.classList.toggle('active', b === btn));
+      document.getElementById('viewList').hidden = view !== 'list';
+      document.getElementById('viewMatrix').hidden = view !== 'matrix';
+      viewFollowups.hidden = view !== 'followups';
+      viewRadar.hidden = view !== 'radar';
+      filtersEl.style.visibility = view === 'radar' ? 'hidden' : '';
+      syncComposer();
+      render();
+    });
+  });
+
+  document.querySelectorAll('#filters button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filter = btn.dataset.filter;
+      document.querySelectorAll('#filters button').forEach(b => b.classList.toggle('active', b === btn));
+      render();
+    });
+  });
+
+  function addEntry() {
+    const text = input.value.trim();
+    if (!text) return;
+    if (view === 'radar') {
+      radar.push({
+        id: 'r' + (nextId++), text,
+        context: newContext,
+        stage: newStage,
+        created: todayStr(),
+        log: []
+      });
+    } else {
+      tasks.push({
+        id: nextId++, text, done: false,
+        context: newContext,
+        urgent: newUrgent, important: newImportant,
+        sorted: newUrgent || newImportant,
+        followUp: newFollow
+      });
+      newUrgent = false; newImportant = false; newFollow = null;
+      newFollowPop.hidden = true;
+    }
+    input.value = '';
+    syncComposer();
+    input.focus();
+    render();
+  }
+
+  const inScope = x => scope === 'both' || x.context === scope;
+
+  function visibleTasks() {
+    return tasks.filter(t => inScope(t) &&
+      (filter === 'all' ? true : filter === 'done' ? t.done : !t.done));
+  }
+
+  /* ---------- Shared row pieces ---------- */
+  function makeCheck(t) {
+    const check = document.createElement('button');
+    check.className = 'check';
+    check.setAttribute('aria-label', t.done ? 'Mark as not done' : 'Mark as done');
+    check.innerHTML = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.8 9L10 3.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    check.addEventListener('click', () => { t.done = !t.done; render(); });
+    return check;
+  }
+
+  function makeText(t) {
+    const span = document.createElement('span');
+    span.className = 'text';
+    span.textContent = t.text;
+    return span;
+  }
+
+  function makeCtxTag(t) {
+    const tag = document.createElement('span');
+    tag.className = 'ctx-tag ' + (t.context === 'work' ? 'w' : 'p');
+    tag.textContent = t.context === 'work' ? 'Work' : 'Private';
+    return tag;
+  }
+
+  function makeFollowChip(t) {
+    const status = followStatus(t);
+    const chip = document.createElement('button');
+    chip.className = 'flag f' + (t.followUp ? ' on' : '') +
+      (status === 'overdue' ? ' overdue' : status === 'today' ? ' today' : '');
+    chip.textContent = t.followUp
+      ? (status === 'overdue' ? '\u26a0 ' : '') + fmtChip(t.followUp, t.context)
+      : '+ Follow up';
+    chip.addEventListener('click', () => {
+      openDateEditor = openDateEditor === t.id ? null : t.id;
+      render();
+    });
+    return chip;
+  }
+
+  function makeTaskEditor(t) {
+    return buildFollowEditor(t.followUp, t.context, f => {
+      t.followUp = f;
+      openDateEditor = null;
+      render();
+    });
+  }
+
+  function makeGrip(item, kind) {
+    const grip = document.createElement('button');
+    grip.className = 'grip';
+    grip.setAttribute('aria-label', kind === 'radar' ? 'Drag to a stage' : 'Drag to a quadrant');
+    grip.innerHTML = '<svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor"><circle cx="2.5" cy="3" r="1.5"/><circle cx="7.5" cy="3" r="1.5"/><circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/><circle cx="2.5" cy="13" r="1.5"/><circle cx="7.5" cy="13" r="1.5"/></svg>';
+    grip.addEventListener('pointerdown', e => startDrag(e, item, kind, grip));
+    return grip;
+  }
+
+  /* ---------- Drag and drop ---------- */
+  let drag = null;
+
+  function startDrag(e, item, kind, gripEl) {
+    e.preventDefault();
+    gripEl.setPointerCapture(e.pointerId);
+
+    const ghost = document.createElement('div');
+    ghost.className = 'drag-ghost';
+    ghost.textContent = item.text;
+    document.body.appendChild(ghost);
+
+    const sourceRow = gripEl.closest('.q-task, .task, .r-card');
+    if (sourceRow) sourceRow.classList.add('dragging-source');
+
+    drag = { item, kind, ghost, sourceRow };
+    moveGhost(e.clientX, e.clientY);
+
+    gripEl.addEventListener('pointermove', onDragMove);
+    gripEl.addEventListener('pointerup', onDragEnd);
+    gripEl.addEventListener('pointercancel', onDragEnd);
+  }
+
+  function moveGhost(x, y) {
+    drag.ghost.style.left = (x + 12) + 'px';
+    drag.ghost.style.top = (y - 14) + 'px';
+  }
+
+  function zoneAt(x, y) {
+    drag.ghost.style.display = 'none';
+    const el = document.elementFromPoint(x, y);
+    drag.ghost.style.display = '';
+    if (!el) return null;
+    return drag.kind === 'radar' ? el.closest('.stage-zone') : el.closest('.quadrant');
+  }
+
+  function onDragMove(e) {
+    if (!drag) return;
+    moveGhost(e.clientX, e.clientY);
+    const z = zoneAt(e.clientX, e.clientY);
+    document.querySelectorAll('.quadrant, .stage-zone').forEach(el =>
+      el.classList.toggle('drop-target', el === z));
+  }
+
+  function onDragEnd(e) {
+    if (!drag) return;
+    const z = zoneAt(e.clientX, e.clientY);
+    if (z) {
+      if (drag.kind === 'radar') {
+        if (z.dataset.stage) drag.item.stage = z.dataset.stage;
+      } else {
+        const def = QUADRANTS.find(x => z.classList.contains('q-' + x.key));
+        if (def) {
+          drag.item.urgent = def.urgent;
+          drag.item.important = def.important;
+          drag.item.sorted = true;
+          if (def.key === 'delegate' && !drag.item.followUp) openDateEditor = drag.item.id;
+        }
+      }
+    }
+    drag.ghost.remove();
+    if (drag.sourceRow) drag.sourceRow.classList.remove('dragging-source');
+    document.querySelectorAll('.quadrant, .stage-zone').forEach(el => el.classList.remove('drop-target'));
+    drag = null;
+    render();
+  }
+
+  /* ---------- Rendering: tasks ---------- */
+  function makeListRow(t) {
+    const li = document.createElement('li');
+    li.className = 'task ctx-' + t.context + (t.done ? ' done' : '');
+
+    const flags = document.createElement('div');
+    flags.className = 'flags';
+
+    const u = document.createElement('button');
+    u.className = 'flag u' + (t.urgent ? ' on' : '');
+    u.textContent = 'Urgent';
+    u.addEventListener('click', () => { t.urgent = !t.urgent; t.sorted = true; render(); });
+
+    const i = document.createElement('button');
+    i.className = 'flag i' + (t.important ? ' on' : '');
+    i.textContent = 'Important';
+    i.addEventListener('click', () => { t.important = !t.important; t.sorted = true; render(); });
+
+    flags.append(u, i, makeFollowChip(t));
+
+    const del = document.createElement('button');
+    del.className = 'del';
+    del.textContent = '\u00d7';
+    del.setAttribute('aria-label', 'Delete task');
+    del.addEventListener('click', () => { tasks = tasks.filter(x => x.id !== t.id); render(); });
+
+    li.append(makeCheck(t), makeText(t));
+    if (scope === 'both') li.append(makeCtxTag(t));
+    li.append(flags, del);
+    if (openDateEditor === t.id) li.append(makeTaskEditor(t));
+    return li;
+  }
+
+  function renderList() {
+    list.innerHTML = '';
+    visibleTasks().forEach(t => list.appendChild(makeListRow(t)));
+  }
+
+  function renderMatrix() {
+    matrixGrid.innerHTML = '';
+    const vis = visibleTasks();
+
+    QUADRANTS.forEach(q => {
+      const box = document.createElement('div');
+      box.className = 'quadrant q-' + q.key;
+
+      const head = document.createElement('div');
+      head.className = 'q-head';
+      const title = document.createElement('span');
+      title.className = 'q-title';
+      title.textContent = q.title;
+      head.appendChild(title);
+      box.appendChild(head);
+
+      const sub = document.createElement('div');
+      sub.className = 'q-sub';
+      sub.textContent = q.sub;
+      box.appendChild(sub);
+
+      const items = vis.filter(t => t.sorted && t.urgent === q.urgent && t.important === q.important);
+      if (items.length === 0) {
+        const e = document.createElement('div');
+        e.className = 'q-empty';
+        e.textContent = 'Nothing here';
+        box.appendChild(e);
+      } else {
+        items.forEach(t => {
+          const row = document.createElement('div');
+          row.className = 'q-task ctx-' + t.context + (t.done ? ' done' : '');
+          row.append(makeGrip(t, 'task'), makeCheck(t), makeText(t));
+          if (scope === 'both') row.append(makeCtxTag(t));
+          row.append(makeFollowChip(t));
+          if (openDateEditor === t.id) row.append(makeTaskEditor(t));
+          box.appendChild(row);
+        });
+      }
+      matrixGrid.appendChild(box);
+    });
+
+    const unsorted = vis.filter(t => !t.sorted);
+    unsortedWrap.hidden = unsorted.length === 0;
+    unsortedList.innerHTML = '';
+    unsorted.forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'task ctx-' + t.context + (t.done ? ' done' : '');
+      li.append(makeGrip(t, 'task'), makeCheck(t), makeText(t));
+      if (scope === 'both') li.append(makeCtxTag(t));
+      li.append(makeFollowChip(t));
+      if (openDateEditor === t.id) li.append(makeTaskEditor(t));
+      unsortedList.appendChild(li);
+    });
+  }
+
+  function renderFollowups() {
+    viewFollowups.innerHTML = '';
+    const vis = visibleTasks();
+    const today = todayStr();
+    const now = new Date();
+    const tomorrow = addDays(1);
+
+    const withDue = vis.filter(t => !t.done && t.followUp);
+    const sortByDue = arr => arr.sort((a, b) => dueMoment(a.followUp) - dueMoment(b.followUp));
+    const inWeek = t => t.followUp.date > tomorrow && t.followUp.date <= weekEndFor(t.context);
+
+    const groups = [
+      { title: 'Overdue', cls: 'overdue',
+        items: sortByDue(withDue.filter(t => dueMoment(t.followUp) < now)) },
+      { title: 'Today', cls: 'today',
+        items: sortByDue(withDue.filter(t => dueMoment(t.followUp) >= now && t.followUp.date === today)) },
+      { title: 'Tomorrow', cls: '',
+        items: sortByDue(withDue.filter(t => t.followUp.date === tomorrow)) },
+      { title: 'End of week', cls: '',
+        items: sortByDue(withDue.filter(inWeek)) },
+      { title: 'Future', cls: '',
+        items: sortByDue(withDue.filter(t => t.followUp.date > tomorrow && !inWeek(t))) },
+      { title: 'Delegated without follow-up', cls: 'nudge',
+        items: vis.filter(t => !t.done && t.sorted && t.urgent && !t.important && !t.followUp),
+        note: 'You delegated these but set no date to check back. Out of sight, out of mind.' }
+    ];
+
+    let any = false;
+    groups.forEach(g => {
+      if (g.items.length === 0) return;
+      any = true;
+      const wrap = document.createElement('div');
+      wrap.className = 'fu-group ' + g.cls;
+      const h = document.createElement('h2');
+      h.textContent = g.title;
+      wrap.appendChild(h);
+      if (g.note) {
+        const n = document.createElement('div');
+        n.className = 'fu-note';
+        n.textContent = g.note;
+        wrap.appendChild(n);
+      }
+      const ul = document.createElement('ul');
+      g.items.forEach(t => ul.appendChild(makeListRow(t)));
+      wrap.appendChild(ul);
+      viewFollowups.appendChild(wrap);
+    });
+
+    if (!any) {
+      const e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = 'No follow-ups. Add one with the follow-up chip on any task.';
+      viewFollowups.appendChild(e);
+    }
+  }
+
+  /* ---------- Rendering: radar ---------- */
+  function makeRadarCard(r) {
+    const card = document.createElement('div');
+    card.className = 'r-card ctx-' + r.context + ' ' + freshness(r);
+
+    const age = document.createElement('span');
+    age.className = 'r-age';
+    age.textContent = ageLabel(r);
+
+    const actions = document.createElement('div');
+    actions.className = 'r-actions';
+
+    const touch = document.createElement('button');
+    touch.className = 'r-btn touch';
+    touch.textContent = 'Check in';
+    touch.addEventListener('click', () => {
+      openCheckin = openCheckin === r.id ? null : r.id;
+      openHistory = null;
+      render();
+    });
+
+    const promote = document.createElement('button');
+    promote.className = 'r-btn promote';
+    promote.textContent = '\u2192 Task';
+    promote.setAttribute('aria-label', 'Promote to task');
+    promote.addEventListener('click', () => {
+      tasks.push({
+        id: nextId++, text: r.text, done: false,
+        context: r.context,
+        urgent: false, important: false, sorted: false,
+        followUp: null
+      });
+      radar = radar.filter(x => x.id !== r.id);
+      render();
+    });
+
+    const del = document.createElement('button');
+    del.className = 'del';
+    del.textContent = '\u00d7';
+    del.setAttribute('aria-label', 'Remove from radar');
+    del.addEventListener('click', () => { radar = radar.filter(x => x.id !== r.id); render(); });
+
+    actions.append(touch, promote, del);
+
+    card.append(makeGrip(r, 'radar'), makeText(r));
+    if (scope === 'both') card.append(makeCtxTag(r));
+    card.append(age, actions);
+
+    if (openCheckin === r.id) {
+      const form = document.createElement('div');
+      form.className = 'r-checkin';
+      const note = document.createElement('input');
+      note.type = 'text';
+      note.placeholder = 'Optional note \u2014 what did you see or decide?';
+      note.setAttribute('aria-label', 'Check-in note');
+      const save = document.createElement('button');
+      save.textContent = 'Log check-in';
+      const doLog = () => {
+        r.log.push({ date: todayStr(), note: note.value.trim() });
+        openCheckin = null;
+        render();
+      };
+      save.addEventListener('click', doLog);
+      note.addEventListener('keydown', e => { if (e.key === 'Enter') doLog(); });
+      form.append(note, save);
+      card.append(form);
+      setTimeout(() => note.focus(), 0);
+    }
+
+    if (r.log.length > 0) {
+      const hist = document.createElement('button');
+      hist.className = 'r-history';
+      hist.textContent = openHistory === r.id ? 'Hide history'
+        : r.log.length + (r.log.length === 1 ? ' check-in' : ' check-ins');
+      hist.addEventListener('click', () => {
+        openHistory = openHistory === r.id ? null : r.id;
+        openCheckin = null;
+        render();
+      });
+      card.append(hist);
+    }
+
+    if (openHistory === r.id) {
+      const logEl = document.createElement('div');
+      logEl.className = 'r-log';
+      [...r.log].reverse().forEach(entry => {
+        const e = document.createElement('div');
+        e.className = 'r-log-entry';
+        const b = document.createElement('b');
+        b.textContent = fmtDate(entry.date);
+        e.append(b, document.createTextNode(entry.note ? ' \u2014 ' + entry.note : ' \u2014 checked in'));
+        logEl.appendChild(e);
+      });
+      card.append(logEl);
+    }
+
+    return card;
+  }
+
+  function renderRadar() {
+    viewRadar.innerHTML = '';
+    const vis = radar.filter(inScope);
+
+    const summary = document.createElement('div');
+    summary.className = 'radar-summary';
+    const stale = vis.filter(r => freshness(r) === 'stale').length;
+    summary.textContent = vis.length === 0 ? '' :
+      vis.length + ' on the radar' + (stale > 0 ? ' \u00b7 ' + stale + ' untouched for 3+ weeks' : ' \u00b7 all recently touched');
+    viewRadar.appendChild(summary);
+
+    STAGES.forEach(s => {
+      const zone = document.createElement('div');
+      zone.className = 'stage-zone';
+      zone.dataset.stage = s.key;
+
+      const h = document.createElement('h2');
+      h.textContent = s.title;
+      const sub = document.createElement('div');
+      sub.className = 'stage-sub';
+      sub.textContent = s.sub;
+      zone.append(h, sub);
+
+      const items = vis.filter(r => r.stage === s.key)
+        .sort((a, b) => touchAge(b) - touchAge(a)); // most neglected first
+      if (items.length === 0) {
+        const e = document.createElement('div');
+        e.className = 'q-empty';
+        e.textContent = 'Nothing here \u2014 drag a card or add one above';
+        zone.appendChild(e);
+      } else {
+        items.forEach(r => zone.appendChild(makeRadarCard(r)));
+      }
+      viewRadar.appendChild(zone);
+    });
+  }
+
+  /* ---------- Persistence: local cache + Dropbox sync ---------- */
+  const STORE_KEY = 'eisenhower-todo-v1';
+  const DBX_FILE = '/tasks-data.json';
+  let storageOk = false;
+
+  // Dropbox connection state (kept in localStorage on each device)
+  const dbx = {
+    get appKey()       { return localStorage.getItem('dbx-app-key') || ''; },
+    set appKey(v)      { localStorage.setItem('dbx-app-key', v); },
+    get refreshToken() { return localStorage.getItem('dbx-refresh') || ''; },
+    set refreshToken(v){ v ? localStorage.setItem('dbx-refresh', v) : localStorage.removeItem('dbx-refresh'); },
+    accessToken: '',
+    accessExpiry: 0
+  };
+
+  let dbxState = dbx.refreshToken ? 'connected' : 'off';  // off | connected | syncing | error
+  let dbxTimer = null;
+  let lastSyncAt = null;
+
+  function applyData(data) {
+    if (Array.isArray(data.tasks)) tasks = data.tasks;
+    if (Array.isArray(data.radar)) radar = data.radar;
+    if (typeof data.nextId === 'number') nextId = data.nextId;
+  }
+
+  const serialize = () => JSON.stringify({ tasks, radar, nextId }, null, 2);
+
+  /* --- OAuth 2 with PKCE (no secret needed in the browser) --- */
+  function b64url(bytes) {
+    return btoa(String.fromCharCode(...new Uint8Array(bytes)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  async function startDropboxAuth() {
+    const verifierBytes = crypto.getRandomValues(new Uint8Array(48));
+    const verifier = b64url(verifierBytes);
+    sessionStorage.setItem('dbx-verifier', verifier);
+    const challenge = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
+    const redirect = location.origin + location.pathname;
+    const url = 'https://www.dropbox.com/oauth2/authorize'
+      + '?client_id=' + encodeURIComponent(dbx.appKey)
+      + '&response_type=code'
+      + '&code_challenge=' + challenge
+      + '&code_challenge_method=S256'
+      + '&token_access_type=offline'
+      + '&redirect_uri=' + encodeURIComponent(redirect);
+    location.href = url;
+  }
+
+  async function tokenRequest(params) {
+    const res = await fetch('https://api.dropboxapi.com/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(params)
+    });
+    if (!res.ok) throw new Error('token request failed: ' + res.status);
+    return res.json();
+  }
+
+  async function finishDropboxAuth() {
+    const code = new URLSearchParams(location.search).get('code');
+    if (!code) return false;
+    const verifier = sessionStorage.getItem('dbx-verifier');
+    history.replaceState(null, '', location.pathname); // clean the URL
+    if (!verifier) return false;
+    try {
+      const data = await tokenRequest({
+        code, grant_type: 'authorization_code',
+        code_verifier: verifier,
+        client_id: dbx.appKey,
+        redirect_uri: location.origin + location.pathname
+      });
+      dbx.refreshToken = data.refresh_token;
+      dbx.accessToken = data.access_token;
+      dbx.accessExpiry = Date.now() + (data.expires_in - 60) * 1000;
+      dbxState = 'connected';
+      return true;
+    } catch (e) {
+      dbxState = 'error';
+      return false;
+    }
+  }
+
+  async function getAccessToken() {
+    if (dbx.accessToken && Date.now() < dbx.accessExpiry) return dbx.accessToken;
+    const data = await tokenRequest({
+      grant_type: 'refresh_token',
+      refresh_token: dbx.refreshToken,
+      client_id: dbx.appKey
+    });
+    dbx.accessToken = data.access_token;
+    dbx.accessExpiry = Date.now() + (data.expires_in - 60) * 1000;
+    return dbx.accessToken;
+  }
+
+  async function dropboxDownload() {
+    const token = await getAccessToken();
+    const res = await fetch('https://content.dropboxapi.com/2/files/download', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Dropbox-API-Arg': JSON.stringify({ path: DBX_FILE })
+      }
+    });
+    if (res.status === 409) return null; // file doesn't exist yet — first run
+    if (!res.ok) throw new Error('download failed: ' + res.status);
+    return res.text();
+  }
+
+  async function dropboxUpload() {
+    const token = await getAccessToken();
+    const res = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Dropbox-API-Arg': JSON.stringify({ path: DBX_FILE, mode: 'overwrite', mute: true }),
+        'Content-Type': 'application/octet-stream'
+      },
+      body: serialize()
+    });
+    if (!res.ok) throw new Error('upload failed: ' + res.status);
+  }
+
+  async function dropboxSyncDown() {
+    if (dbxState === 'off') return;
+    try {
+      dbxState = 'syncing'; updateStatus();
+      const text = await dropboxDownload();
+      if (text && text.trim()) applyData(JSON.parse(text));
+      else await dropboxUpload();           // nothing remote yet: seed it with local data
+      lastSyncAt = new Date();
+      dbxState = 'connected';
+    } catch (e) {
+      dbxState = 'error';
+    }
+    updateStatus();
+  }
+
+  async function dropboxSyncUp() {
+    if (dbxState === 'off' || !dbx.refreshToken) return;
+    try {
+      dbxState = 'syncing'; updateStatus();
+      await dropboxUpload();
+      lastSyncAt = new Date();
+      dbxState = 'connected';
+    } catch (e) {
+      dbxState = 'error';
+    }
+    updateStatus();
+  }
+
+  function scheduleDropboxUpload() {
+    if (!dbx.refreshToken) return;
+    clearTimeout(dbxTimer);
+    dbxTimer = setTimeout(dropboxSyncUp, 1200);
+  }
+
+  function disconnectDropbox() {
+    dbx.refreshToken = '';
+    dbx.accessToken = '';
+    dbxState = 'off';
+    updateStatus();
+  }
+
+  function updateStatus() {
+    const s = document.getElementById('storageStatus');
+    const btn = document.getElementById('dbxBtn');
+    const dis = document.getElementById('dbxDisconnect');
+    if (!s) return;
+
+    btn.hidden = !!dbx.refreshToken;
+    dis.hidden = !dbx.refreshToken;
+
+    const counts = tasks.length + ' tasks, ' + radar.length + ' radar items';
+    if (dbx.refreshToken) {
+      if (dbxState === 'syncing') s.textContent = 'Syncing with Dropbox\u2026';
+      else if (dbxState === 'error') s.textContent = '\u26a0 Dropbox sync failed \u2014 data is safe on this device and will retry on your next change';
+      else s.textContent = 'Synced with Dropbox' + (lastSyncAt ? ' at ' + lastSyncAt.toTimeString().slice(0,5) : '') + ' \u00b7 ' + counts;
+    } else if (storageOk) {
+      s.textContent = 'Saved on this device only \u00b7 ' + counts;
+    } else {
+      s.textContent = 'Auto-save unavailable here \u2014 host this file and open it in a browser';
+    }
+  }
+
+  function saveData() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ tasks, radar, nextId }));
+      storageOk = true;
+    } catch (e) {
+      storageOk = false;
+    }
+    scheduleDropboxUpload();
+    updateStatus();
+  }
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) applyData(JSON.parse(raw));
+    } catch (e) { /* start fresh */ }
+  }
+
+  /* --- Wiring --- */
+  document.getElementById('dbxBtn').addEventListener('click', () => {
+    if (!dbx.appKey) {
+      document.getElementById('dbxSetup').hidden = false;
+      document.getElementById('dbxKeyInput').focus();
+    } else {
+      startDropboxAuth();
+    }
+  });
+
+  document.getElementById('dbxKeySave').addEventListener('click', () => {
+    const key = document.getElementById('dbxKeyInput').value.trim();
+    if (!key) return;
+    dbx.appKey = key;
+    document.getElementById('dbxSetup').hidden = true;
+    startDropboxAuth();
+  });
+
+  document.getElementById('dbxDisconnect').addEventListener('click', disconnectDropbox);
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const blob = new Blob([serialize()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'tasks-backup-' + todayStr() + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  document.getElementById('importBtn').addEventListener('click', () =>
+    document.getElementById('importFile').click());
+
+  document.getElementById('importFile').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if (!Array.isArray(data.tasks) || !Array.isArray(data.radar)) throw new Error('bad shape');
+        applyData(data);
+        render();
+      } catch (err) {
+        alert('That file doesn\u2019t look like a backup from this app.');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  // Flush any pending upload when the app is backgrounded or closed
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && dbxTimer) {
+      clearTimeout(dbxTimer);
+      dropboxSyncUp();
+    }
+  });
+
+  /* ---------- Master render ---------- */
+  function render() {
+    if (view === 'list') renderList();
+    else if (view === 'matrix') renderMatrix();
+    else if (view === 'followups') renderFollowups();
+    else renderRadar();
+
+    const scoped = tasks.filter(inScope);
+    const remaining = scoped.filter(t => !t.done).length;
+    const doNow = scoped.filter(t => !t.done && t.urgent && t.important).length;
+    const overdue = scoped.filter(t => followStatus(t) === 'overdue').length;
+
+    let line = scoped.length === 0 ? '' :
+      remaining === 0 ? 'All done' :
+      remaining + (remaining === 1 ? ' task remaining' : ' tasks remaining') +
+      (doNow > 0 ? ' \u00b7 ' + doNow + ' to do now' : '');
+    count.innerHTML = '';
+    count.append(document.createTextNode(line));
+    if (overdue > 0) {
+      const s = document.createElement('span');
+      s.className = 'overdue-note';
+      s.textContent = ' \u00b7 ' + overdue + ' overdue';
+      count.appendChild(s);
+    }
+
+    fuPill.innerHTML = 'Follow-ups';
+    if (overdue > 0) {
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      fuPill.appendChild(dot);
+    }
+
+    let anyVisible;
+    if (view === 'followups') anyVisible = true;
+    else if (view === 'radar') anyVisible = radar.filter(inScope).length > 0;
+    else anyVisible = visibleTasks().length > 0;
+
+    empty.hidden = anyVisible;
+    if (!empty.hidden) {
+      if (view === 'radar') {
+        empty.textContent = 'Nothing on your radar yet. Add something above \u2014 no date needed.';
+      } else {
+        const scopeName = scope === 'both' ? '' : scope + ' ';
+        empty.textContent = tasks.filter(inScope).length === 0 ? 'No ' + scopeName + 'tasks yet. Add your first above.' :
+          filter === 'done' ? 'No completed ' + scopeName + 'tasks yet.' : 'No active ' + scopeName + 'tasks \u2014 nice work.';
+      }
+    }
+    saveData();
+  }
+
+  setInterval(() => {
+    if (!drag && openDateEditor === null && openCheckin === null && document.visibilityState === 'visible') render();
+  }, 60000);
+
+  (async function init() {
+    loadData();                    // fast start from the local cache
+    syncComposer();
+    render();
+    const justConnected = await finishDropboxAuth();  // returning from the Dropbox consent screen?
+    if (dbx.refreshToken) await dropboxSyncDown();    // Dropbox copy wins over the local cache
+    if (justConnected) render(); else if (dbx.refreshToken) render();
+  })();
+</script>
+</body>
+</html>
