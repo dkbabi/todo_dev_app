@@ -522,9 +522,11 @@
   .pantry-item { border-left-color: var(--teal); }
 
   .move-chooser {
-    width: 100%; display: flex; gap: 6px; flex-wrap: wrap;
+    width: 100%; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
     padding-top: 8px; border-top: 1px dashed var(--line); margin-top: 4px;
   }
+
+  .move-label { font-size: 12px; color: var(--muted); width: 100%; }
 
   /* =====================================================================
      MISC & FOOTER
@@ -589,8 +591,8 @@
   <div class="scope" id="scope" role="tablist" aria-label="Work or private tasks">
     <button data-scope="work" class="active-work">Work</button>
     <button data-scope="private">Private</button>
-    <button data-scope="groceries">Groceries</button>
     <button data-scope="both">Both</button>
+    <button data-scope="groceries">Groceries</button>
   </div>
 
   <div class="composer">
@@ -742,6 +744,20 @@ const Cal = {
     return [...byDate.values()];
   },
 
+  /** Shopping-day quick picks with colliding days merged ("Today \u00b7 Saturday"). */
+  shoppingDays() {
+    const opts = [
+      ['Today', Cal.today()], ['Tomorrow', Cal.addDays(1)],
+      ['Saturday', Cal.thisSaturday()], ['Sunday', Cal.thisSunday()]
+    ];
+    const byDate = new Map();
+    for (const [label, date] of opts) {
+      if (date < Cal.today()) continue;
+      byDate.set(date, byDate.has(date) ? byDate.get(date) + ' \u00b7 ' + label : label);
+    }
+    return [...byDate.entries()].map(([date, label]) => ({ date, label }));
+  },
+
   /** Monday (ISO) of the week containing the given date. */
   mondayOf(iso) {
     const d = Cal.fromIso(iso);
@@ -871,6 +887,7 @@ const S = {
     openNotes: new Set(),     // task ids with note panel expanded
     pendingSubFocus: null,    // refocus add-subtask input after render
     openMoveTo: null,         // pantry item id with the move-to-list chooser open
+    moveMode: null,           // 'newItem' (fresh list holding it) | 'newTitle' (own list)
     composer: { context: 'work', urgent: false, important: false, follow: null, stage: 'watching', gdate: null }
   }
 };
@@ -1524,23 +1541,63 @@ const Views = {
           el('button', { class: 'flag gl', text: '\u2192 List', 'aria-label': 'Move to a shopping list',
             onclick: () => {
               S.ui.openMoveTo = S.ui.openMoveTo === item.id ? null : item.id;
+              S.ui.moveMode = null;
               render();
             } })),
         el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Remove item',
           onclick: () => { S.data.pantry = S.data.pantry.filter(x => x.id !== item.id); render(); } }));
 
       if (S.ui.openMoveTo === item.id) {
-        row.append(el('div', { class: 'move-chooser' },
-          upcomingLists.length === 0
-            ? el('span', { class: 'zone-empty', text: 'No upcoming list yet \u2014 create one under Lists first' })
-            : upcomingLists.map(g => el('button', { class: 'flag',
-                text: GroceryTitle(g),
-                onclick: () => {
-                  g.items.push({ id: 's' + uid(), text: item.text, done: false });
-                  S.data.pantry = S.data.pantry.filter(x => x.id !== item.id);
-                  S.ui.openMoveTo = null;
-                  render();
-                } }))));
+        const finish = () => {
+          S.data.pantry = S.data.pantry.filter(x => x.id !== item.id);
+          S.ui.openMoveTo = null;
+          S.ui.moveMode = null;
+          render();
+        };
+
+        const chooser = el('div', { class: 'move-chooser' });
+
+        if (S.ui.moveMode === null) {
+          // Outcome 1: join an existing list as a subtask
+          if (upcomingLists.length > 0) {
+            chooser.append(el('span', { class: 'move-label', text: 'Add as item to:' }));
+            chooser.append(...upcomingLists.map(g => el('button', { class: 'flag',
+              text: GroceryTitle(g),
+              onclick: () => {
+                g.items.push({ id: 's' + uid(), text: item.text, done: false });
+                finish();
+              } })));
+          }
+          // Outcomes 2 & 3: create something new for it
+          chooser.append(el('span', { class: 'move-label', text: upcomingLists.length > 0 ? 'Or:' : 'No upcoming list \u2014 create:' }));
+          chooser.append(
+            el('button', { class: 'flag gl', text: '+ New list holding it',
+              onclick: () => { S.ui.moveMode = 'newItem'; render(); } }),
+            el('button', { class: 'flag gl', text: '+ Own list (as title)',
+              onclick: () => { S.ui.moveMode = 'newTitle'; render(); } }));
+        } else {
+          // A creation mode is chosen: pick the day
+          const create = (date) => {
+            if (S.ui.moveMode === 'newTitle') {
+              S.data.groceryLists.push({ id: 'g' + uid(), name: item.text, date, items: [], note: '' });
+            } else {
+              S.data.groceryLists.push({ id: 'g' + uid(), name: '', date,
+                items: [{ id: 's' + uid(), text: item.text, done: false }], note: '' });
+            }
+            finish();
+          };
+          chooser.append(el('span', { class: 'move-label',
+            text: (S.ui.moveMode === 'newTitle' ? '\u201c' + item.text + '\u201d as its own list \u2014 which day?' : 'New list holding \u201c' + item.text + '\u201d \u2014 which day?') }));
+          chooser.append(...Cal.shoppingDays().map(o =>
+            el('button', { class: 'flag gl', text: o.label + ' \u00b7 ' + Cal.fmt(o.date),
+              onclick: () => create(o.date) })));
+          const custom = el('input', { type: 'date', class: 'g-date', 'aria-label': 'Shopping day' });
+          custom.addEventListener('change', () => { if (custom.value) create(custom.value); });
+          chooser.append(custom,
+            el('button', { class: 'clear-date', text: 'Back',
+              onclick: () => { S.ui.moveMode = null; render(); } }));
+        }
+        row.append(chooser);
       }
       return row;
     }));
@@ -1840,18 +1897,7 @@ const Composer = {
         text: label + ' \u00b7 ' + Cal.fmt(date),
         onclick: () => { c.gdate = date; Composer.render(); }
       });
-      const opts = [
-        ['Today', Cal.today()], ['Tomorrow', Cal.addDays(1)],
-        ['Saturday', Cal.thisSaturday()], ['Sunday', Cal.thisSunday()]
-      ];
-      // Colliding days merge labels (e.g. on a Saturday: "Today \u00b7 Saturday")
-      const byDate = new Map();
-      for (const [label, date] of opts) {
-        if (date < Cal.today()) continue;
-        if (byDate.has(date)) byDate.set(date, byDate.get(date) + ' \u00b7 ' + label);
-        else byDate.set(date, label);
-      }
-      for (const [date, label] of byDate) host.append(day(label, date));
+      for (const o of Cal.shoppingDays()) host.append(day(o.label, o.date));
       const custom = el('input', { type: 'date', 'aria-label': 'Shopping day', class: 'g-date' });
       if (c.gdate) custom.value = c.gdate;
       custom.addEventListener('change', () => {
