@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* =====================================================================
+     DESIGN TOKENS
+     ===================================================================== */
   :root {
     --bg: #FAF8F4;
     --surface: #FFFFFF;
@@ -31,76 +34,63 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 64px 24px;
+    padding: 48px 24px;
   }
 
   .app { width: 100%; max-width: 720px; }
 
+  button { font-family: inherit; cursor: pointer; }
+  input { font-family: inherit; }
+  button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--slate);
+    outline-offset: 2px;
+  }
+  ul { list-style: none; }
+
+  /* =====================================================================
+     HEADER & SCOPE
+     ===================================================================== */
   header { margin-bottom: 20px; }
 
   .eyebrow {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--teal);
-    margin-bottom: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--teal); margin-bottom: 8px;
   }
 
   h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.01em; }
   .count { font-size: 14px; color: var(--muted); margin-top: 6px; }
   .count .overdue-note { color: var(--clay); font-weight: 600; }
 
-  /* ---------- Scope ---------- */
   .scope {
-    display: inline-flex;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 3px;
-    margin-bottom: 20px;
-    gap: 2px;
+    display: inline-flex; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 3px; margin-bottom: 20px; gap: 2px;
   }
 
   .scope button {
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 8px 18px;
-    border: none;
-    border-radius: 999px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
+    font-size: 13px; font-weight: 600; padding: 8px 18px;
+    border: none; border-radius: 999px; background: transparent;
+    color: var(--muted); transition: all 0.15s;
   }
 
   .scope button.active-work { background: var(--slate); color: #fff; }
   .scope button.active-private { background: var(--clay); color: #fff; }
   .scope button.active-both { background: var(--charcoal); color: #fff; }
 
-  /* ---------- Composer ---------- */
+  /* =====================================================================
+     COMPOSER
+     ===================================================================== */
   .composer {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 12px;
-    margin-bottom: 20px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 12px; margin-bottom: 20px;
   }
 
   .input-row { display: flex; gap: 10px; }
 
   .input-row input {
-    flex: 1;
-    min-width: 0;
-    font-family: inherit;
-    font-size: 16px;
-    padding: 12px 14px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--bg);
-    color: var(--charcoal);
-    outline: none;
+    flex: 1; min-width: 0; font-size: 16px; padding: 12px 14px;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg); color: var(--charcoal); outline: none;
     transition: border-color 0.15s;
   }
 
@@ -108,58 +98,33 @@
   .input-row input::placeholder { color: var(--muted); }
 
   .input-row > button {
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 0 22px;
-    border: none;
-    border-radius: 10px;
-    background: var(--charcoal);
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.15s;
+    font-size: 15px; font-weight: 600; padding: 0 22px;
+    border: none; border-radius: 10px; background: var(--charcoal);
+    color: #fff; transition: background 0.15s;
   }
 
   .input-row > button:hover { background: #45453f; }
 
   .composer-flags {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 10px; flex-wrap: wrap;
   }
 
-  .composer-flags .hint { font-size: 12px; color: var(--muted); margin-right: 4px; }
   .composer-flags .sep { width: 1px; height: 18px; background: var(--line); margin: 0 4px; }
 
   .composer-target {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-    margin-left: auto;
+    font-size: 12px; font-weight: 600; color: var(--muted); margin-left: auto;
   }
 
-  button:focus-visible, .grip:focus-visible, input:focus-visible {
-    outline: 2px solid var(--slate);
-    outline-offset: 2px;
-  }
-
+  /* =====================================================================
+     CHIPS (flags)
+     ===================================================================== */
   .flag {
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    padding: 7px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 7px 14px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent;
+    color: var(--muted); transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 5px;
   }
 
   .flag.u.on { background: var(--clay-soft); border-color: var(--clay); color: var(--clay); }
@@ -170,45 +135,33 @@
   .flag.cw.on { background: var(--slate); border-color: var(--slate); color: #fff; }
   .flag.cp.on { background: var(--clay); border-color: var(--clay); color: #fff; }
   .flag.st.on { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+  .flag.sc.on { background: var(--grey-soft); border-color: var(--muted); color: var(--charcoal); }
+  .flag.sc.complete { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); }
 
-  /* ---------- Follow-up editor ---------- */
+  /* =====================================================================
+     FOLLOW-UP EDITOR
+     ===================================================================== */
   .date-pop { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
   .mode-toggle { display: flex; gap: 4px; }
 
   .mode-toggle button {
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 12px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
+    font-size: 12px; font-weight: 600; padding: 6px 12px;
+    border: 1px solid var(--line); border-radius: 999px;
+    background: transparent; color: var(--muted); transition: all 0.15s;
   }
 
   .mode-toggle button.active { background: var(--slate); border-color: var(--slate); color: #fff; }
 
   .date-pop input[type="date"], .date-pop input[type="time"] {
-    font-family: inherit;
-    font-size: 14px;
-    padding: 6px 9px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--charcoal);
+    font-size: 14px; padding: 6px 9px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: var(--surface); color: var(--charcoal);
   }
 
   .date-pop .clear-date {
-    font-family: inherit;
-    font-size: 12px;
-    border: none;
-    background: none;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 6px 4px;
+    font-size: 12px; border: none; background: none;
+    color: var(--muted); padding: 6px 4px;
   }
 
   .date-pop .clear-date:hover { color: var(--clay); }
@@ -216,78 +169,50 @@
   .quick-dates { display: flex; gap: 5px; flex-wrap: wrap; }
 
   .quick-dates button {
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 6px 11px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface);
-    color: var(--charcoal);
-    cursor: pointer;
-    transition: all 0.15s;
+    font-size: 12px; font-weight: 500; padding: 6px 11px;
+    border: 1px solid var(--line); border-radius: 999px;
+    background: var(--surface); color: var(--charcoal); transition: all 0.15s;
   }
 
   .quick-dates button:hover { border-color: var(--slate); }
   .quick-dates button small { color: var(--muted); font-weight: 400; margin-left: 4px; }
 
-  /* ---------- Toolbar ---------- */
+  /* =====================================================================
+     TOOLBAR (views + filters)
+     ===================================================================== */
   .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
   }
 
   .pills { display: flex; gap: 6px; flex-wrap: wrap; }
 
   .pills button {
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 16px;
-    min-height: 36px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
+    font-size: 13px; font-weight: 500; padding: 8px 16px; min-height: 36px;
+    border: 1px solid var(--line); border-radius: 999px;
+    background: transparent; color: var(--muted); transition: all 0.15s;
   }
 
-  .pills button.active {
-    background: var(--charcoal);
-    border-color: var(--charcoal);
-    color: #fff;
-  }
+  .pills button.active { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
 
   .pills button .dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--clay);
-    margin-left: 6px;
-    vertical-align: 1px;
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--clay); margin-left: 6px; vertical-align: 1px;
   }
 
-  /* ---------- Task rows ---------- */
-  ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  /* =====================================================================
+     TASK ROWS (shared by list, follow-ups, matrix)
+     ===================================================================== */
+  .tasks { display: flex; flex-direction: column; gap: 8px; }
 
   .task {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    border-left-width: 4px;
-    transition: border-color 0.15s;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; border-left-width: 4px;
+    transition: border-color 0.15s; flex-wrap: wrap;
   }
+
+  .task.compact { padding: 8px 10px; border-radius: 9px; font-size: 14px; gap: 8px; }
 
   .task.ctx-work { border-left-color: var(--slate); }
   .task.ctx-private { border-left-color: var(--clay); }
@@ -295,12 +220,8 @@
   .task.ctx-private:hover { border-color: var(--clay); }
 
   .ctx-tag {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 999px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
     flex-shrink: 0;
   }
 
@@ -308,68 +229,89 @@
   .ctx-tag.p { background: var(--clay-soft); color: var(--clay); }
 
   .check {
-    width: 22px;
-    height: 22px;
-    border: 2px solid var(--line);
-    border-radius: 50%;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    background: none;
-    padding: 0;
-    transition: all 0.15s;
+    width: 22px; height: 22px; border: 2px solid var(--line);
+    border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: none; padding: 0; transition: all 0.15s;
   }
 
-  .task.done .check, .q-task.done .check { background: var(--teal); border-color: var(--teal); }
+  .task.compact .check { width: 18px; height: 18px; }
+  .done > .check { background: var(--teal); border-color: var(--teal); }
   .check svg { opacity: 0; transition: opacity 0.15s; }
-  .task.done .check svg, .q-task.done .check svg { opacity: 1; }
+  .done > .check svg { opacity: 1; }
 
   .task .text { flex: 1; font-size: 15px; min-width: 0; overflow-wrap: break-word; }
-  .task.done .text, .q-task.done .text { color: var(--muted); text-decoration: line-through; }
+  .task.compact .text { font-size: 14px; }
+  .task.done .text { color: var(--muted); text-decoration: line-through; }
 
   .flags { display: flex; gap: 5px; flex-shrink: 0; flex-wrap: wrap; }
   .flags .flag { font-size: 11px; padding: 5px 10px; }
+  .task.compact .flag.f { font-size: 10px; padding: 4px 8px; }
 
-  .task .del, .r-card .del {
-    border: none;
-    background: none;
-    color: var(--muted);
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 4px 6px;
-    border-radius: 6px;
-    opacity: 0;
-    transition: opacity 0.15s, color 0.15s;
+  .del {
+    border: none; background: none; color: var(--muted);
+    font-size: 18px; line-height: 1; padding: 4px 6px;
+    border-radius: 6px; opacity: 0; transition: opacity 0.15s, color 0.15s;
   }
 
-  .task:hover .del, .task .del:focus-visible,
-  .r-card:hover .del, .r-card .del:focus-visible { opacity: 1; }
-  .task .del:hover, .r-card .del:hover { color: var(--clay); }
+  .task:hover .del, .r-card:hover .del, .sub-row:hover .del,
+  .del:focus-visible { opacity: 1; }
+  .del:hover { color: var(--clay); }
 
-  .task .date-pop, .q-task .date-pop { width: 100%; padding-left: 34px; }
+  .task .date-pop { width: 100%; padding-left: 34px; }
 
-  /* ---------- Matrix view ---------- */
+  .edit-input {
+    flex: 1; min-width: 0; font-size: 15px; padding: 6px 10px;
+    border: 1px solid var(--teal); border-radius: 8px;
+    background: var(--bg); color: var(--charcoal); outline: none;
+  }
+
+  /* =====================================================================
+     SUBTASKS
+     ===================================================================== */
+  .sub-panel { width: 100%; padding-left: 34px; }
+
+  .sub-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; border-top: 1px dashed var(--line);
+  }
+
+  .sub-row .check { width: 18px; height: 18px; }
+  .sub-row .text { font-size: 14px; flex: 1; min-width: 0; overflow-wrap: break-word; }
+  .sub-row.done .text { color: var(--muted); text-decoration: line-through; }
+
+  .sub-add { display: flex; gap: 8px; padding: 8px 0 2px; }
+
+  .sub-add input {
+    flex: 1; min-width: 0; font-size: 14px; padding: 8px 11px;
+    border: 1px solid var(--line); border-radius: 9px;
+    background: var(--bg); outline: none;
+  }
+
+  .sub-add input:focus { border-color: var(--teal); }
+
+  .sub-add button {
+    font-size: 13px; font-weight: 600; padding: 8px 14px;
+    border: none; border-radius: 9px; background: var(--charcoal); color: #fff;
+  }
+
+  /* =====================================================================
+     MATRIX VIEW
+     ===================================================================== */
   .matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
   .quadrant {
-    border-radius: 14px;
-    padding: 16px;
-    min-height: 140px;
-    border: 2px solid transparent;
-    transition: border-color 0.15s;
+    border-radius: 14px; padding: 16px; min-height: 140px;
+    border: 2px solid transparent; transition: border-color 0.15s;
   }
 
   .quadrant.q-do { background: var(--clay-soft); }
   .quadrant.q-schedule { background: var(--teal-soft); }
   .quadrant.q-delegate { background: var(--slate-soft); }
   .quadrant.q-eliminate { background: var(--grey-soft); }
-  .quadrant.drop-target, .stage-zone.drop-target { border-color: var(--charcoal) !important; }
+  .drop-target { border-color: var(--charcoal) !important; }
 
-  .q-head { margin-bottom: 4px; }
-  .q-title { font-size: 14px; font-weight: 700; }
+  .q-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .q-do .q-title { color: var(--clay); }
   .q-schedule .q-title { color: var(--teal); }
   .q-delegate .q-title { color: var(--slate); }
@@ -377,106 +319,65 @@
 
   .q-sub { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
 
-  .q-task {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--surface);
-    border-radius: 9px;
-    border-left: 4px solid transparent;
-    padding: 8px 10px;
-    margin-bottom: 6px;
-    font-size: 14px;
-    flex-wrap: wrap;
-  }
-
-  .q-task.ctx-work { border-left-color: var(--slate); }
-  .q-task.ctx-private { border-left-color: var(--clay); }
-
-  .q-task .check { width: 18px; height: 18px; }
-  .q-task .text { flex: 1; min-width: 0; overflow-wrap: break-word; }
-  .q-task .flag.f { font-size: 10px; padding: 4px 8px; }
+  .quadrant .task { background: var(--surface); border-color: transparent; margin-bottom: 6px; }
+  .quadrant .task.ctx-work { border-left-color: var(--slate); }
+  .quadrant .task.ctx-private { border-left-color: var(--clay); }
 
   .grip {
-    border: none;
-    background: none;
-    color: var(--muted);
-    cursor: grab;
-    padding: 6px 4px;
-    margin: -6px 0;
-    flex-shrink: 0;
-    border-radius: 6px;
-    touch-action: none;
-    display: flex;
-    align-items: center;
+    border: none; background: none; color: var(--muted);
+    cursor: grab; padding: 6px 4px; margin: -6px 0;
+    flex-shrink: 0; border-radius: 6px; touch-action: none;
+    display: flex; align-items: center;
   }
 
   .grip:active { cursor: grabbing; }
 
-  .q-empty { font-size: 13px; color: var(--muted); font-style: italic; }
+  .zone-empty { font-size: 13px; color: var(--muted); font-style: italic; }
 
   .unsorted { margin-top: 20px; }
   .unsorted h2 { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
 
   .drag-ghost {
-    position: fixed;
-    z-index: 100;
-    pointer-events: none;
-    background: var(--surface);
-    border: 1px solid var(--slate);
-    border-radius: 9px;
-    padding: 8px 14px;
-    font-size: 14px;
+    position: fixed; z-index: 100; pointer-events: none;
+    background: var(--surface); border: 1px solid var(--slate);
+    border-radius: 9px; padding: 8px 14px; font-size: 14px;
     box-shadow: 0 6px 20px rgba(43,43,40,0.15);
-    max-width: 260px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
   .dragging-source { opacity: 0.35; }
 
-  /* ---------- Follow-ups view ---------- */
+  /* =====================================================================
+     FOLLOW-UPS VIEW
+     ===================================================================== */
   .fu-group { margin-bottom: 24px; }
   .fu-group h2 {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    color: var(--muted);
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 10px; color: var(--muted);
   }
   .fu-group.overdue h2 { color: var(--clay); }
   .fu-group.today h2 { color: var(--teal); }
   .fu-group.nudge h2 { color: var(--slate); }
   .fu-note { font-size: 13px; color: var(--muted); margin: -4px 0 10px; }
 
-  /* ---------- Radar view ---------- */
+  /* =====================================================================
+     RADAR VIEW
+     ===================================================================== */
   .radar-summary { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 
   .stage-zone {
-    border: 2px dashed var(--line);
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 14px;
-    transition: border-color 0.15s;
+    border: 2px dashed var(--line); border-radius: 14px;
+    padding: 14px; margin-bottom: 14px; transition: border-color 0.15s;
   }
 
   .stage-zone h2 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-  .stage-zone .stage-sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
-  .stage-zone .q-empty { margin-bottom: 2px; }
+  .stage-sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 
   .r-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-left-width: 4px;
-    border-radius: 11px;
-    padding: 11px 13px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-left-width: 4px; border-radius: 11px;
+    padding: 11px 13px; margin-bottom: 8px; flex-wrap: wrap;
     transition: opacity 0.2s;
   }
 
@@ -493,95 +394,54 @@
   .r-actions { display: flex; gap: 5px; flex-shrink: 0; align-items: center; }
 
   .r-btn {
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    padding: 6px 11px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+    padding: 6px 11px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent;
+    color: var(--muted); transition: all 0.15s;
   }
 
   .r-btn.touch:hover { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); }
   .r-btn.promote:hover { background: var(--slate-soft); border-color: var(--slate); color: var(--slate); }
 
-  .r-checkin {
-    width: 100%;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
+  .r-checkin { width: 100%; display: flex; gap: 8px; align-items: center; }
 
   .r-checkin input {
-    flex: 1;
-    min-width: 0;
-    font-family: inherit;
-    font-size: 14px;
-    padding: 8px 11px;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    background: var(--bg);
-    outline: none;
+    flex: 1; min-width: 0; font-size: 14px; padding: 8px 11px;
+    border: 1px solid var(--line); border-radius: 9px;
+    background: var(--bg); outline: none;
   }
 
   .r-checkin input:focus { border-color: var(--teal); }
 
   .r-checkin button {
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 9px;
-    background: var(--teal);
-    color: #fff;
-    cursor: pointer;
+    font-size: 13px; font-weight: 600; padding: 8px 14px;
+    border: none; border-radius: 9px; background: var(--teal); color: #fff;
   }
 
   .r-log { width: 100%; font-size: 13px; color: var(--muted); }
-  .r-log .r-log-entry { padding: 4px 0; border-top: 1px dashed var(--line); }
-  .r-log .r-log-entry b { color: var(--charcoal); font-weight: 600; }
+  .r-log-entry { padding: 4px 0; border-top: 1px dashed var(--line); }
+  .r-log-entry b { color: var(--charcoal); font-weight: 600; }
 
   .r-history {
-    border: none;
-    background: none;
-    font-family: inherit;
-    font-size: 12px;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 4px;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    border: none; background: none; font-size: 12px; color: var(--muted);
+    padding: 4px; text-decoration: underline; text-underline-offset: 2px;
   }
 
+  /* =====================================================================
+     MISC & FOOTER
+     ===================================================================== */
   .empty { text-align: center; padding: 48px 0; color: var(--muted); font-size: 15px; }
+  .loading { text-align: center; padding: 80px 0; color: var(--muted); font-size: 15px; }
 
   .data-bar {
-    margin-top: 28px;
-    padding-top: 14px;
-    border-top: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 12px;
-    color: var(--muted);
-    flex-wrap: wrap;
+    margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line);
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px; color: var(--muted); flex-wrap: wrap;
   }
 
   .data-bar button {
-    font-family: inherit;
-    font-size: 12px;
-    border: none;
-    background: none;
-    color: var(--slate);
-    cursor: pointer;
-    padding: 4px 0;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    font-size: 12px; border: none; background: none; color: var(--slate);
+    padding: 4px 0; text-decoration: underline; text-underline-offset: 2px;
   }
 
   .data-bar button:hover { color: var(--charcoal); }
@@ -589,31 +449,28 @@
   .dbx-setup { border-top: none; margin-top: 6px; padding-top: 0; }
 
   .dbx-setup input {
-    font-family: inherit;
-    font-size: 13px;
-    padding: 7px 10px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--charcoal);
-    outline: none;
-    min-width: 180px;
+    font-size: 13px; padding: 7px 10px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: var(--surface); color: var(--charcoal);
+    outline: none; min-width: 180px;
   }
 
   .dbx-setup input:focus { border-color: var(--teal); }
 
-  /* ---------- Responsive & touch ---------- */
+  /* =====================================================================
+     RESPONSIVE & TOUCH
+     ===================================================================== */
   @media (max-width: 600px) {
-    body { padding: 32px 16px; }
+    body { padding: 24px 14px; }
     h1 { font-size: 26px; }
     .matrix { grid-template-columns: 1fr; }
-    .task .flags { order: 3; width: 100%; padding-left: 34px; }
+    .task:not(.compact) .flags { order: 3; width: 100%; padding-left: 34px; }
     .r-actions { width: 100%; justify-content: flex-end; }
   }
 
   @media (hover: none) {
-    .task { padding: 16px 14px; }
-    .task .del, .r-card .del { opacity: 1; padding: 10px 12px; margin: -10px -6px -10px 0; }
+    .task:not(.compact) { padding: 16px 14px; }
+    .del { opacity: 1; padding: 10px 12px; margin: -10px -6px -10px 0; }
     .flags .flag { padding: 7px 12px; }
   }
 
@@ -639,53 +496,19 @@
   <div class="composer">
     <div class="input-row">
       <input id="input" type="text" placeholder="Add a task…" aria-label="New task">
-      <button id="add">Add</button>
+      <button id="addBtn">Add</button>
     </div>
-    <div class="composer-flags">
-      <button class="flag cw" id="newWork" aria-pressed="true">Work</button>
-      <button class="flag cp" id="newPrivate" aria-pressed="false">Private</button>
-      <span class="sep" id="taskFlagsSep"></span>
-      <button class="flag u" id="newUrgent" aria-pressed="false">Urgent</button>
-      <button class="flag i" id="newImportant" aria-pressed="false">Important</button>
-      <button class="flag f" id="newFollowBtn" aria-pressed="false">Follow up</button>
-      <span class="sep" id="stageFlagsSep" hidden></span>
-      <button class="flag st" id="stWatching" hidden>Watching</button>
-      <button class="flag st" id="stSimmering" hidden>Simmering</button>
-      <button class="flag st" id="stWinding" hidden>Winding down</button>
-      <span class="composer-target" id="composerTarget"></span>
-    </div>
-    <div class="composer-flags" id="newFollowPop" hidden></div>
+    <div class="composer-flags" id="composerFlags"></div>
+    <div class="composer-flags" id="composerFollowPop" hidden></div>
   </div>
 
   <div class="toolbar">
-    <div class="pills" id="views" role="tablist" aria-label="View">
-      <button data-view="list" class="active">List</button>
-      <button data-view="matrix">Matrix</button>
-      <button data-view="followups" id="fuPill">Follow-ups</button>
-      <button data-view="radar">Radar</button>
-    </div>
-    <div class="pills" id="filters" role="tablist" aria-label="Filter tasks">
-      <button data-filter="all" class="active">All</button>
-      <button data-filter="active">Active</button>
-      <button data-filter="done">Done</button>
-    </div>
+    <div class="pills" id="viewPills" role="tablist" aria-label="View"></div>
+    <div class="pills" id="filterPills" role="tablist" aria-label="Filter tasks"></div>
   </div>
 
-  <div id="viewList"><ul id="list"></ul></div>
-
-  <div id="viewMatrix" hidden>
-    <div class="matrix" id="matrixGrid"></div>
-    <div class="unsorted" id="unsortedWrap" hidden>
-      <h2>Unsorted — drag into a quadrant</h2>
-      <ul id="unsortedList"></ul>
-    </div>
-  </div>
-
-  <div id="viewFollowups" hidden></div>
-
-  <div id="viewRadar" hidden></div>
-
-  <div class="empty" id="empty" hidden></div>
+  <div id="viewHost"></div>
+  <div class="empty" id="emptyMsg" hidden></div>
 
   <div class="data-bar">
     <span id="storageStatus"></span>
@@ -701,88 +524,66 @@
     <button id="dbxKeySave">Save &amp; connect</button>
   </div>
 </div>
-
 <script>
-  let tasks = [];
-  let radar = [];
-  let filter = 'all';
-  let view = 'list';
-  let scope = 'work';
-  let nextId = 1;
-  let newUrgent = false, newImportant = false;
-  let newContext = 'work';
-  let newFollow = null;
-  let newStage = 'watching';
-  let openDateEditor = null;
-  let openCheckin = null;      // radar item id with check-in form open
-  let openHistory = null;      // radar item id with history expanded
+'use strict';
 
-  const QUADRANTS = [
-    { key: 'do',        title: 'Do now',    sub: 'Urgent + important',           urgent: true,  important: true  },
-    { key: 'schedule',  title: 'Schedule',  sub: 'Important, not urgent',        urgent: false, important: true  },
-    { key: 'delegate',  title: 'Delegate',  sub: 'Urgent, not important',        urgent: true,  important: false },
-    { key: 'eliminate', title: 'Eliminate', sub: 'Neither urgent nor important', urgent: false, important: false }
-  ];
+/* =========================================================================
+   1. UTILITIES
+   ========================================================================= */
 
-  const STAGES = [
-    { key: 'watching',  title: 'Watching',     sub: 'On the radar, nothing to do yet' },
-    { key: 'simmering', title: 'Simmering',    sub: 'Developing \u2014 may need action before long' },
-    { key: 'winding',   title: 'Winding down', sub: 'Letting go \u2014 confirm and close out' }
-  ];
-
-  const targetName = (u, i) => u && i ? 'Do now' : i ? 'Schedule' : u ? 'Delegate' : '';
-
-  /* ---------- Date helpers ---------- */
-  function toIso(d) {
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+/** Tiny DOM builder: el('button', {class:'flag', onclick:fn, text:'Hi'}, child…) */
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k === 'html') n.innerHTML = v;
+    else if (k === 'dataset') Object.assign(n.dataset, v);
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? '' : v);
   }
+  for (const kid of kids.flat(2)) if (kid != null) n.append(kid);
+  return n;
+}
 
-  const todayStr = () => toIso(new Date());
+const $ = id => document.getElementById(id);
 
-  function fromIso(iso) {
+const CHECK_SVG = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.8 9L10 3.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const GRIP_SVG = '<svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor"><circle cx="2.5" cy="3" r="1.5"/><circle cx="7.5" cy="3" r="1.5"/><circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/><circle cx="2.5" cy="13" r="1.5"/><circle cx="7.5" cy="13" r="1.5"/></svg>';
+
+/* =========================================================================
+   2. DATES & THE WORK/PRIVATE CALENDAR
+   All follow-up arithmetic lives here. "work" counts Mon–Fri; "private"
+   counts calendar days. Weeks start Monday (DK convention).
+   ========================================================================= */
+const Cal = {
+  toIso(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  },
+  fromIso(iso) {
     const [y, m, d] = iso.split('-').map(Number);
     return new Date(y, m - 1, d);
-  }
-
-  function fmtDate(iso) {
-    return fromIso(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  }
-
-  function addDays(n) {
-    const d = new Date();
-    d.setDate(d.getDate() + n);
-    return toIso(d);
-  }
-
-  const isWeekend = iso => [0, 6].includes(fromIso(iso).getDay());
-
-  function rollToMonday(iso) {
-    const d = fromIso(iso);
+  },
+  today() { return Cal.toIso(new Date()); },
+  fmt(iso) { return Cal.fromIso(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); },
+  addDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return Cal.toIso(d); },
+  isWeekend(iso) { return [0, 6].includes(Cal.fromIso(iso).getDay()); },
+  rollToMonday(iso) {
+    const d = Cal.fromIso(iso);
     while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
-    return toIso(d);
-  }
-
-  function dueMoment(f) {
-    const d = fromIso(f.date);
-    if (f.time) {
-      const [hh, mm] = f.time.split(':').map(Number);
-      d.setHours(hh, mm, 0, 0);
-    } else {
-      d.setHours(23, 59, 59, 0);
-    }
-    return d;
-  }
-
-  function dayDiff(iso) {
-    const target = fromIso(iso);
+    return Cal.toIso(d);
+  },
+  /** Signed calendar-day distance from today. */
+  dayDiff(iso) {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    return Math.round((target - today) / 86400000);
-  }
-
-  function workDayDiff(iso) {
-    const today = fromIso(todayStr());
-    const target = fromIso(iso);
+    return Math.round((Cal.fromIso(iso) - today) / 86400000);
+  },
+  /** Signed working-day (Mon–Fri) distance from today. */
+  workDayDiff(iso) {
+    const today = Cal.fromIso(Cal.today());
+    const target = Cal.fromIso(iso);
     if (+today === +target) return 0;
     const sign = target > today ? 1 : -1;
     let count = 0;
@@ -793,76 +594,97 @@
       if (dow !== 0 && dow !== 6) count += sign;
     }
     return count;
-  }
-
-  function thisFriday() {
+  },
+  _weekday(offsetFromMonday, plusWeeks = 0) {
     const d = new Date();
-    const dow = (d.getDay() + 6) % 7;
-    d.setDate(d.getDate() + (4 - dow));
-    return toIso(d);
-  }
+    const dow = (d.getDay() + 6) % 7;                // Mon=0 … Sun=6
+    d.setDate(d.getDate() + (offsetFromMonday - dow) + plusWeeks * 7);
+    return Cal.toIso(d);
+  },
+  thisFriday()  { return Cal._weekday(4); },
+  nextFriday()  { return Cal._weekday(4, 1); },
+  thisSunday()  { return Cal._weekday(6); },
+  nextSunday()  { return Cal._weekday(6, 1); },
+  /** The date that closes "this week" for a given context. */
+  weekEndFor(ctx) { return ctx === 'work' ? Cal.thisFriday() : Cal.thisSunday(); },
 
-  function nextFriday() {
-    const d = fromIso(thisFriday());
-    d.setDate(d.getDate() + 7);
-    return toIso(d);
-  }
-
-  function thisSunday() {
-    const d = new Date();
-    const dow = (d.getDay() + 6) % 7;
-    d.setDate(d.getDate() + (6 - dow));
-    return toIso(d);
-  }
-
-  function nextSunday() {
-    const d = fromIso(thisSunday());
-    d.setDate(d.getDate() + 7);
-    return toIso(d);
-  }
-
-  const weekEndFor = ctx => ctx === 'work' ? thisFriday() : thisSunday();
-
-  function quickDateOptions(ctx) {
+  /**
+   * Quick-pick options for the follow-up editor, computed per context.
+   * Options landing on the same date merge labels (e.g. Thursday:
+   * "Tomorrow · End of week") so none can silently disappear.
+   */
+  quickOptions(ctx) {
     let opts;
     if (ctx === 'work') {
-      const t1 = rollToMonday(addDays(1));
+      const t1 = Cal.rollToMonday(Cal.addDays(1));
       opts = [
-        { label: dayDiff(t1) === 1 ? 'Tomorrow' : 'Monday', date: t1 },
-        { label: 'End of week', date: thisFriday() },
-        { label: 'One week from now', date: rollToMonday(addDays(7)) },
-        { label: 'End of following week', date: nextFriday() }
+        { label: Cal.dayDiff(t1) === 1 ? 'Tomorrow' : 'Monday', date: t1 },
+        { label: 'End of week', date: Cal.thisFriday() },
+        { label: 'One week from now', date: Cal.rollToMonday(Cal.addDays(7)) },
+        { label: 'End of following week', date: Cal.nextFriday() }
       ];
     } else {
       opts = [
-        { label: 'Tomorrow', date: addDays(1) },
-        { label: 'End of week', date: thisSunday() },
-        { label: 'One week from now', date: addDays(7) },
-        { label: 'End of following week', date: nextSunday() }
+        { label: 'Tomorrow', date: Cal.addDays(1) },
+        { label: 'End of week', date: Cal.thisSunday() },
+        { label: 'One week from now', date: Cal.addDays(7) },
+        { label: 'End of following week', date: Cal.nextSunday() }
       ];
     }
-    const today = todayStr();
+    const today = Cal.today();
     const byDate = new Map();
-    opts.forEach(o => {
-      if (o.date <= today) return;
+    for (const o of opts) {
+      if (o.date <= today) continue;
       if (byDate.has(o.date)) byDate.get(o.date).label += ' \u00b7 ' + o.label;
       else byDate.set(o.date, { ...o });
-    });
-    return [...byDate.values()];
-  }
-
-  function remainingLabel(iso, ctx) {
-    if (ctx === 'work') {
-      const wd = workDayDiff(iso);
-      return wd === 1 ? '1 wd' : wd + ' wd';
     }
-    const dd = dayDiff(iso);
-    return dd === 1 ? '1 d' : dd + ' d';
-  }
+    return [...byDate.values()];
+  },
 
-  function countdownText(f, ctx) {
+  /** "1 wd" / "3 d" — the remaining-time suffix on quick-pick buttons. */
+  remainingLabel(iso, ctx) {
+    if (ctx === 'work') {
+      const wd = Cal.workDayDiff(iso);
+      return wd + ' wd';
+    }
+    return Cal.dayDiff(iso) + ' d';
+  }
+};
+
+/* =========================================================================
+   3. DOMAIN MODEL
+   Follow-ups: { date:'YYYY-MM-DD', time:'HH:MM'|null }. A date-only
+   follow-up is due at end of that day; a timed one at that minute.
+   ========================================================================= */
+const QUADRANTS = [
+  { key: 'do',        title: 'Do now',    sub: 'Urgent + important',           urgent: true,  important: true  },
+  { key: 'schedule',  title: 'Schedule',  sub: 'Important, not urgent',        urgent: false, important: true  },
+  { key: 'delegate',  title: 'Delegate',  sub: 'Urgent, not important',        urgent: true,  important: false },
+  { key: 'eliminate', title: 'Eliminate', sub: 'Neither urgent nor important', urgent: false, important: false }
+];
+
+const STAGES = [
+  { key: 'watching',  title: 'Watching',     sub: 'On the radar, nothing to do yet' },
+  { key: 'simmering', title: 'Simmering',    sub: 'Developing \u2014 may need action before long' },
+  { key: 'winding',   title: 'Winding down', sub: 'Letting go \u2014 confirm and close out' }
+];
+
+const Follow = {
+  dueMoment(f) {
+    const d = Cal.fromIso(f.date);
+    if (f.time) { const [hh, mm] = f.time.split(':').map(Number); d.setHours(hh, mm, 0, 0); }
+    else d.setHours(23, 59, 59, 0);
+    return d;
+  },
+  status(t) {
+    if (!t.followUp || t.done) return null;
+    if (Follow.dueMoment(t.followUp) < new Date()) return 'overdue';
+    if (t.followUp.date === Cal.today()) return 'today';
+    return 'upcoming';
+  },
+  countdown(f, ctx) {
     if (f.time) {
-      const diffMin = Math.round((dueMoment(f) - new Date()) / 60000);
+      const diffMin = Math.round((Follow.dueMoment(f) - new Date()) / 60000);
       const abs = Math.abs(diffMin);
       let span;
       if (abs < 60) span = abs + ' min';
@@ -870,752 +692,152 @@
       else span = Math.floor(abs / 1440) + ' d';
       return diffMin >= 0 ? 'in ' + span : span + ' over';
     }
-    const dd = dayDiff(f.date);
+    const dd = Cal.dayDiff(f.date);
     if (dd === 0) return 'today';
-    if (ctx === 'work') {
-      const wd = workDayDiff(f.date);
-      if (dd > 0) return dd === 1 ? 'tomorrow' : 'in ' + wd + ' wd';
-      return (-wd) + ' wd over';
-    }
     if (dd === 1) return 'tomorrow';
-    if (dd > 1) return 'in ' + dd + ' d';
-    return (-dd) + ' d over';
-  }
-
-  function followStatus(t) {
-    if (!t.followUp || t.done) return null;
-    if (dueMoment(t.followUp) < new Date()) return 'overdue';
-    if (t.followUp.date === todayStr()) return 'today';
-    return 'upcoming';
-  }
-
-  function fmtChip(f, ctx) {
+    if (ctx === 'work') {
+      const wd = Cal.workDayDiff(f.date);
+      return dd > 0 ? 'in ' + wd + ' wd' : (-wd) + ' wd over';
+    }
+    return dd > 0 ? 'in ' + dd + ' d' : (-dd) + ' d over';
+  },
+  chipLabel(f, ctx) {
     const when = f.time
-      ? (f.date === todayStr() ? f.time : fmtDate(f.date) + ' ' + f.time)
-      : fmtDate(f.date);
-    return when + ' \u00b7 ' + countdownText(f, ctx);
+      ? (f.date === Cal.today() ? f.time : Cal.fmt(f.date) + ' ' + f.time)
+      : Cal.fmt(f.date);
+    return when + ' \u00b7 ' + Follow.countdown(f, ctx);
   }
+};
 
-  /* ---------- Radar helpers ---------- */
-  const lastTouch = r => r.log.length ? r.log[r.log.length - 1].date : r.created;
-
-  function touchAge(r) {
-    return -dayDiff(lastTouch(r)); // days since last touch
-  }
-
-  function ageLabel(r) {
-    const a = touchAge(r);
-    if (a === 0) return 'touched today';
-    if (a === 1) return 'touched yesterday';
-    return 'touched ' + a + ' d ago';
-  }
-
-  const freshness = r => {
-    const a = touchAge(r);
+const Radar = {
+  lastTouch: r => r.log.length ? r.log[r.log.length - 1].date : r.created,
+  age: r => -Cal.dayDiff(Radar.lastTouch(r)),
+  ageLabel(r) {
+    const a = Radar.age(r);
+    return a === 0 ? 'touched today' : a === 1 ? 'touched yesterday' : 'touched ' + a + ' d ago';
+  },
+  freshness(r) {
+    const a = Radar.age(r);
     return a < 7 ? 'fresh' : a < 21 ? 'aging' : 'stale';
-  };
+  }
+};
 
-  /* ---------- Elements ---------- */
-  const input = document.getElementById('input');
-  const list = document.getElementById('list');
-  const count = document.getElementById('count');
-  const empty = document.getElementById('empty');
-  const matrixGrid = document.getElementById('matrixGrid');
-  const unsortedWrap = document.getElementById('unsortedWrap');
-  const unsortedList = document.getElementById('unsortedList');
-  const viewFollowups = document.getElementById('viewFollowups');
-  const viewRadar = document.getElementById('viewRadar');
-  const composerTarget = document.getElementById('composerTarget');
-  const btnNewU = document.getElementById('newUrgent');
-  const btnNewI = document.getElementById('newImportant');
-  const btnNewF = document.getElementById('newFollowBtn');
-  const btnNewW = document.getElementById('newWork');
-  const btnNewP = document.getElementById('newPrivate');
-  const newFollowPop = document.getElementById('newFollowPop');
-  const fuPill = document.getElementById('fuPill');
-  const filtersEl = document.getElementById('filters');
-  const stageBtns = {
-    watching: document.getElementById('stWatching'),
-    simmering: document.getElementById('stSimmering'),
-    winding: document.getElementById('stWinding')
-  };
+const Subs = {
+  stats(t) {
+    const subs = t.subs || [];
+    return { total: subs.length, done: subs.filter(s => s.done).length };
+  }
+};
 
-  document.getElementById('add').addEventListener('click', addEntry);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); });
+/* =========================================================================
+   4. STATE
+   S.data is what persists (identical shape to every earlier version).
+   S.ui is transient per-session state.
+   ========================================================================= */
+const S = {
+  data: { tasks: [], radar: [], nextId: 1 },
+  ui: {
+    scope: 'work',            // work | private | both
+    view: 'list',             // list | matrix | followups | radar
+    filter: 'all',            // all | active | done
+    openDateEditor: null,     // task id with the follow-up editor open
+    openEdit: null,           // id (task/sub/radar) being renamed
+    openCheckin: null,        // radar id with check-in form open
+    openHistory: null,        // radar id with history expanded
+    openSubs: new Set(),      // task ids with subtask panel expanded
+    pendingSubFocus: null,    // refocus add-subtask input after render
+    composer: { context: 'work', urgent: false, important: false, follow: null, stage: 'watching' }
+  }
+};
 
-  btnNewU.addEventListener('click', () => { newUrgent = !newUrgent; syncComposer(); });
-  btnNewI.addEventListener('click', () => { newImportant = !newImportant; syncComposer(); });
-  btnNewW.addEventListener('click', () => setNewContext('work'));
-  btnNewP.addEventListener('click', () => setNewContext('private'));
+/** Accept any historical data shape and normalise it. */
+function migrate(data) {
+  if (Array.isArray(data.tasks)) S.data.tasks = data.tasks;
+  if (Array.isArray(data.radar)) S.data.radar = data.radar;
+  if (typeof data.nextId === 'number') S.data.nextId = data.nextId;
+  for (const t of S.data.tasks) {
+    if (!Array.isArray(t.subs)) t.subs = [];
+    if (!t.context) t.context = 'work';
+  }
+  for (const r of S.data.radar) {
+    if (!Array.isArray(r.log)) r.log = [];
+    if (!r.stage) r.stage = 'watching';
+    if (!r.context) r.context = 'work';
+  }
+}
 
-  Object.entries(stageBtns).forEach(([key, btn]) =>
-    btn.addEventListener('click', () => { newStage = key; syncComposer(); }));
+const uid = () => S.data.nextId++;
+const inScope = x => S.ui.scope === 'both' || x.context === S.ui.scope;
 
-  function setNewContext(ctx) {
-    if (newContext !== ctx) {
-      newContext = ctx;
-      if (newFollow && !newFollow.time && ctx === 'work' && isWeekend(newFollow.date)) {
-        newFollow = { date: rollToMonday(newFollow.date), time: null };
-      }
-      newFollowPop.hidden = true;
+function visibleTasks() {
+  const f = S.ui.filter;
+  return S.data.tasks.filter(t => inScope(t) && (f === 'all' || (f === 'done') === t.done));
+}
+
+/* =========================================================================
+   5. PERSISTENCE — local cache (always) + Dropbox sync (optional)
+   Keys are unchanged from previous versions, so existing data loads as-is.
+   ========================================================================= */
+const Store = {
+  LOCAL_KEY: 'eisenhower-todo-v1',
+  DBX_FILE: '/tasks-data.json',
+  localOk: false,
+  state: 'off',              // off | connected | syncing | error
+  lastSyncAt: null,
+  _timer: null,
+
+  serialize() { return JSON.stringify(S.data, null, 2); },
+
+  get appKey()        { return localStorage.getItem('dbx-app-key') || ''; },
+  set appKey(v)       { localStorage.setItem('dbx-app-key', v); },
+  get refreshToken()  { return localStorage.getItem('dbx-refresh') || ''; },
+  set refreshToken(v) { v ? localStorage.setItem('dbx-refresh', v) : localStorage.removeItem('dbx-refresh'); },
+  accessToken: '',
+  accessExpiry: 0,
+
+  loadLocal() {
+    try {
+      const raw = localStorage.getItem(Store.LOCAL_KEY);
+      if (raw) migrate(JSON.parse(raw));
+    } catch (e) { /* start fresh */ }
+  },
+
+  /** Called after every state change: local write + debounced Dropbox upload. */
+  save() {
+    try {
+      localStorage.setItem(Store.LOCAL_KEY, Store.serialize());
+      Store.localOk = true;
+    } catch (e) { Store.localOk = false; }
+    if (Store.refreshToken) {
+      clearTimeout(Store._timer);
+      Store._timer = setTimeout(() => Store.syncUp(), 1200);
     }
-    syncComposer();
-  }
-
-  btnNewF.addEventListener('click', () => {
-    if (newFollowPop.hidden) {
-      newFollowPop.hidden = false;
-      newFollowPop.innerHTML = '';
-      newFollowPop.appendChild(buildFollowEditor(newFollow, newContext, f => {
-        newFollow = f;
-        newFollowPop.hidden = true;
-        syncComposer();
-      }));
-    } else {
-      newFollowPop.hidden = true;
-    }
-  });
-
-  function syncComposer() {
-    const radarMode = view === 'radar';
-
-    btnNewW.classList.toggle('on', newContext === 'work');
-    btnNewP.classList.toggle('on', newContext === 'private');
-    btnNewW.setAttribute('aria-pressed', newContext === 'work');
-    btnNewP.setAttribute('aria-pressed', newContext === 'private');
-
-    // task-only chips
-    [btnNewU, btnNewI, btnNewF].forEach(b => b.hidden = radarMode);
-    document.getElementById('taskFlagsSep').hidden = radarMode;
-    if (radarMode) newFollowPop.hidden = true;
-
-    // radar-only chips
-    document.getElementById('stageFlagsSep').hidden = !radarMode;
-    Object.entries(stageBtns).forEach(([key, btn]) => {
-      btn.hidden = !radarMode;
-      btn.classList.toggle('on', newStage === key);
-      btn.setAttribute('aria-pressed', newStage === key);
-    });
-
-    input.placeholder = radarMode ? 'Add to radar\u2026' : 'Add a task\u2026';
-
-    btnNewU.classList.toggle('on', newUrgent);
-    btnNewI.classList.toggle('on', newImportant);
-    btnNewU.setAttribute('aria-pressed', newUrgent);
-    btnNewI.setAttribute('aria-pressed', newImportant);
-    btnNewF.classList.toggle('on', !!newFollow);
-    btnNewF.setAttribute('aria-pressed', !!newFollow);
-    btnNewF.textContent = newFollow ? 'Follow up ' + fmtChip(newFollow, newContext) : 'Follow up';
-
-    const name = targetName(newUrgent, newImportant);
-    composerTarget.textContent = radarMode ? '' : (name ? '\u2192 ' + name : '');
-  }
-
-  /* ---------- Follow-up editor ---------- */
-  function buildFollowEditor(current, ctx, onDone) {
-    const pop = document.createElement('div');
-    pop.className = 'date-pop';
-
-    let mode = current && !current.time ? 'date' : 'today';
-
-    const toggle = document.createElement('div');
-    toggle.className = 'mode-toggle';
-    const bToday = document.createElement('button');
-    bToday.textContent = 'Later today';
-    const bDate = document.createElement('button');
-    bDate.textContent = 'Pick a date';
-    toggle.append(bToday, bDate);
-
-    const timeInput = document.createElement('input');
-    timeInput.type = 'time';
-    timeInput.setAttribute('aria-label', 'Follow-up time today');
-    timeInput.value = current && current.time ? current.time : '';
-
-    const quick = document.createElement('div');
-    quick.className = 'quick-dates';
-    quickDateOptions(ctx).forEach(o => {
-      const b = document.createElement('button');
-      b.appendChild(document.createTextNode(o.label));
-      const small = document.createElement('small');
-      small.textContent = fmtDate(o.date) + ' \u00b7 ' + remainingLabel(o.date, ctx);
-      b.appendChild(small);
-      b.addEventListener('click', () => onDone({ date: o.date, time: null }));
-      quick.appendChild(b);
-    });
-
-    const dateInput = document.createElement('input');
-    dateInput.type = 'date';
-    dateInput.setAttribute('aria-label', 'Custom follow-up date');
-    dateInput.value = current && !current.time ? current.date : '';
-
-    const clear = document.createElement('button');
-    clear.className = 'clear-date';
-    clear.textContent = 'Clear';
-
-    function setMode(m, openPicker) {
-      mode = m;
-      bToday.classList.toggle('active', m === 'today');
-      bDate.classList.toggle('active', m === 'date');
-      timeInput.style.display = m === 'today' ? '' : 'none';
-      quick.style.display = m === 'date' ? '' : 'none';
-      dateInput.style.display = m === 'date' ? '' : 'none';
-      if (openPicker && m === 'today') {
-        setTimeout(() => {
-          timeInput.focus();
-          if (timeInput.showPicker) { try { timeInput.showPicker(); } catch(e) {} }
-        }, 0);
-      }
-    }
-
-    bToday.addEventListener('click', () => setMode('today', true));
-    bDate.addEventListener('click', () => setMode('date', true));
-
-    timeInput.addEventListener('change', () => {
-      if (timeInput.value) onDone({ date: todayStr(), time: timeInput.value });
-    });
-
-    dateInput.addEventListener('change', () => {
-      if (!dateInput.value) return;
-      let date = dateInput.value;
-      if (ctx === 'work' && isWeekend(date)) date = rollToMonday(date);
-      onDone({ date, time: null });
-    });
-
-    clear.addEventListener('click', () => onDone(null));
-
-    pop.append(toggle, timeInput, quick, dateInput, clear);
-    setMode(mode, false);
-    return pop;
-  }
-
-  /* ---------- Scope, views, filters ---------- */
-  document.querySelectorAll('#scope button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      scope = btn.dataset.scope;
-      document.querySelectorAll('#scope button').forEach(b => {
-        b.className = '';
-        if (b === btn) b.className = 'active-' + scope;
-      });
-      if (scope !== 'both') setNewContext(scope);
-      render();
-    });
-  });
-
-  document.querySelectorAll('#views button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      view = btn.dataset.view;
-      document.querySelectorAll('#views button').forEach(b => b.classList.toggle('active', b === btn));
-      document.getElementById('viewList').hidden = view !== 'list';
-      document.getElementById('viewMatrix').hidden = view !== 'matrix';
-      viewFollowups.hidden = view !== 'followups';
-      viewRadar.hidden = view !== 'radar';
-      filtersEl.style.visibility = view === 'radar' ? 'hidden' : '';
-      syncComposer();
-      render();
-    });
-  });
-
-  document.querySelectorAll('#filters button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      filter = btn.dataset.filter;
-      document.querySelectorAll('#filters button').forEach(b => b.classList.toggle('active', b === btn));
-      render();
-    });
-  });
-
-  function addEntry() {
-    const text = input.value.trim();
-    if (!text) return;
-    if (view === 'radar') {
-      radar.push({
-        id: 'r' + (nextId++), text,
-        context: newContext,
-        stage: newStage,
-        created: todayStr(),
-        log: []
-      });
-    } else {
-      tasks.push({
-        id: nextId++, text, done: false,
-        context: newContext,
-        urgent: newUrgent, important: newImportant,
-        sorted: newUrgent || newImportant,
-        followUp: newFollow
-      });
-      newUrgent = false; newImportant = false; newFollow = null;
-      newFollowPop.hidden = true;
-    }
-    input.value = '';
-    syncComposer();
-    input.focus();
-    render();
-  }
-
-  const inScope = x => scope === 'both' || x.context === scope;
-
-  function visibleTasks() {
-    return tasks.filter(t => inScope(t) &&
-      (filter === 'all' ? true : filter === 'done' ? t.done : !t.done));
-  }
-
-  /* ---------- Shared row pieces ---------- */
-  function makeCheck(t) {
-    const check = document.createElement('button');
-    check.className = 'check';
-    check.setAttribute('aria-label', t.done ? 'Mark as not done' : 'Mark as done');
-    check.innerHTML = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.8 9L10 3.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    check.addEventListener('click', () => { t.done = !t.done; render(); });
-    return check;
-  }
-
-  function makeText(t) {
-    const span = document.createElement('span');
-    span.className = 'text';
-    span.textContent = t.text;
-    return span;
-  }
-
-  function makeCtxTag(t) {
-    const tag = document.createElement('span');
-    tag.className = 'ctx-tag ' + (t.context === 'work' ? 'w' : 'p');
-    tag.textContent = t.context === 'work' ? 'Work' : 'Private';
-    return tag;
-  }
-
-  function makeFollowChip(t) {
-    const status = followStatus(t);
-    const chip = document.createElement('button');
-    chip.className = 'flag f' + (t.followUp ? ' on' : '') +
-      (status === 'overdue' ? ' overdue' : status === 'today' ? ' today' : '');
-    chip.textContent = t.followUp
-      ? (status === 'overdue' ? '\u26a0 ' : '') + fmtChip(t.followUp, t.context)
-      : '+ Follow up';
-    chip.addEventListener('click', () => {
-      openDateEditor = openDateEditor === t.id ? null : t.id;
-      render();
-    });
-    return chip;
-  }
-
-  function makeTaskEditor(t) {
-    return buildFollowEditor(t.followUp, t.context, f => {
-      t.followUp = f;
-      openDateEditor = null;
-      render();
-    });
-  }
-
-  function makeGrip(item, kind) {
-    const grip = document.createElement('button');
-    grip.className = 'grip';
-    grip.setAttribute('aria-label', kind === 'radar' ? 'Drag to a stage' : 'Drag to a quadrant');
-    grip.innerHTML = '<svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor"><circle cx="2.5" cy="3" r="1.5"/><circle cx="7.5" cy="3" r="1.5"/><circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/><circle cx="2.5" cy="13" r="1.5"/><circle cx="7.5" cy="13" r="1.5"/></svg>';
-    grip.addEventListener('pointerdown', e => startDrag(e, item, kind, grip));
-    return grip;
-  }
-
-  /* ---------- Drag and drop ---------- */
-  let drag = null;
-
-  function startDrag(e, item, kind, gripEl) {
-    e.preventDefault();
-    gripEl.setPointerCapture(e.pointerId);
-
-    const ghost = document.createElement('div');
-    ghost.className = 'drag-ghost';
-    ghost.textContent = item.text;
-    document.body.appendChild(ghost);
-
-    const sourceRow = gripEl.closest('.q-task, .task, .r-card');
-    if (sourceRow) sourceRow.classList.add('dragging-source');
-
-    drag = { item, kind, ghost, sourceRow };
-    moveGhost(e.clientX, e.clientY);
-
-    gripEl.addEventListener('pointermove', onDragMove);
-    gripEl.addEventListener('pointerup', onDragEnd);
-    gripEl.addEventListener('pointercancel', onDragEnd);
-  }
-
-  function moveGhost(x, y) {
-    drag.ghost.style.left = (x + 12) + 'px';
-    drag.ghost.style.top = (y - 14) + 'px';
-  }
-
-  function zoneAt(x, y) {
-    drag.ghost.style.display = 'none';
-    const el = document.elementFromPoint(x, y);
-    drag.ghost.style.display = '';
-    if (!el) return null;
-    return drag.kind === 'radar' ? el.closest('.stage-zone') : el.closest('.quadrant');
-  }
-
-  function onDragMove(e) {
-    if (!drag) return;
-    moveGhost(e.clientX, e.clientY);
-    const z = zoneAt(e.clientX, e.clientY);
-    document.querySelectorAll('.quadrant, .stage-zone').forEach(el =>
-      el.classList.toggle('drop-target', el === z));
-  }
-
-  function onDragEnd(e) {
-    if (!drag) return;
-    const z = zoneAt(e.clientX, e.clientY);
-    if (z) {
-      if (drag.kind === 'radar') {
-        if (z.dataset.stage) drag.item.stage = z.dataset.stage;
-      } else {
-        const def = QUADRANTS.find(x => z.classList.contains('q-' + x.key));
-        if (def) {
-          drag.item.urgent = def.urgent;
-          drag.item.important = def.important;
-          drag.item.sorted = true;
-          if (def.key === 'delegate' && !drag.item.followUp) openDateEditor = drag.item.id;
-        }
-      }
-    }
-    drag.ghost.remove();
-    if (drag.sourceRow) drag.sourceRow.classList.remove('dragging-source');
-    document.querySelectorAll('.quadrant, .stage-zone').forEach(el => el.classList.remove('drop-target'));
-    drag = null;
-    render();
-  }
-
-  /* ---------- Rendering: tasks ---------- */
-  function makeListRow(t) {
-    const li = document.createElement('li');
-    li.className = 'task ctx-' + t.context + (t.done ? ' done' : '');
-
-    const flags = document.createElement('div');
-    flags.className = 'flags';
-
-    const u = document.createElement('button');
-    u.className = 'flag u' + (t.urgent ? ' on' : '');
-    u.textContent = 'Urgent';
-    u.addEventListener('click', () => { t.urgent = !t.urgent; t.sorted = true; render(); });
-
-    const i = document.createElement('button');
-    i.className = 'flag i' + (t.important ? ' on' : '');
-    i.textContent = 'Important';
-    i.addEventListener('click', () => { t.important = !t.important; t.sorted = true; render(); });
-
-    flags.append(u, i, makeFollowChip(t));
-
-    const del = document.createElement('button');
-    del.className = 'del';
-    del.textContent = '\u00d7';
-    del.setAttribute('aria-label', 'Delete task');
-    del.addEventListener('click', () => { tasks = tasks.filter(x => x.id !== t.id); render(); });
-
-    li.append(makeCheck(t), makeText(t));
-    if (scope === 'both') li.append(makeCtxTag(t));
-    li.append(flags, del);
-    if (openDateEditor === t.id) li.append(makeTaskEditor(t));
-    return li;
-  }
-
-  function renderList() {
-    list.innerHTML = '';
-    visibleTasks().forEach(t => list.appendChild(makeListRow(t)));
-  }
-
-  function renderMatrix() {
-    matrixGrid.innerHTML = '';
-    const vis = visibleTasks();
-
-    QUADRANTS.forEach(q => {
-      const box = document.createElement('div');
-      box.className = 'quadrant q-' + q.key;
-
-      const head = document.createElement('div');
-      head.className = 'q-head';
-      const title = document.createElement('span');
-      title.className = 'q-title';
-      title.textContent = q.title;
-      head.appendChild(title);
-      box.appendChild(head);
-
-      const sub = document.createElement('div');
-      sub.className = 'q-sub';
-      sub.textContent = q.sub;
-      box.appendChild(sub);
-
-      const items = vis.filter(t => t.sorted && t.urgent === q.urgent && t.important === q.important);
-      if (items.length === 0) {
-        const e = document.createElement('div');
-        e.className = 'q-empty';
-        e.textContent = 'Nothing here';
-        box.appendChild(e);
-      } else {
-        items.forEach(t => {
-          const row = document.createElement('div');
-          row.className = 'q-task ctx-' + t.context + (t.done ? ' done' : '');
-          row.append(makeGrip(t, 'task'), makeCheck(t), makeText(t));
-          if (scope === 'both') row.append(makeCtxTag(t));
-          row.append(makeFollowChip(t));
-          if (openDateEditor === t.id) row.append(makeTaskEditor(t));
-          box.appendChild(row);
-        });
-      }
-      matrixGrid.appendChild(box);
-    });
-
-    const unsorted = vis.filter(t => !t.sorted);
-    unsortedWrap.hidden = unsorted.length === 0;
-    unsortedList.innerHTML = '';
-    unsorted.forEach(t => {
-      const li = document.createElement('li');
-      li.className = 'task ctx-' + t.context + (t.done ? ' done' : '');
-      li.append(makeGrip(t, 'task'), makeCheck(t), makeText(t));
-      if (scope === 'both') li.append(makeCtxTag(t));
-      li.append(makeFollowChip(t));
-      if (openDateEditor === t.id) li.append(makeTaskEditor(t));
-      unsortedList.appendChild(li);
-    });
-  }
-
-  function renderFollowups() {
-    viewFollowups.innerHTML = '';
-    const vis = visibleTasks();
-    const today = todayStr();
-    const now = new Date();
-    const tomorrow = addDays(1);
-
-    const withDue = vis.filter(t => !t.done && t.followUp);
-    const sortByDue = arr => arr.sort((a, b) => dueMoment(a.followUp) - dueMoment(b.followUp));
-    const inWeek = t => t.followUp.date > tomorrow && t.followUp.date <= weekEndFor(t.context);
-
-    const groups = [
-      { title: 'Overdue', cls: 'overdue',
-        items: sortByDue(withDue.filter(t => dueMoment(t.followUp) < now)) },
-      { title: 'Today', cls: 'today',
-        items: sortByDue(withDue.filter(t => dueMoment(t.followUp) >= now && t.followUp.date === today)) },
-      { title: 'Tomorrow', cls: '',
-        items: sortByDue(withDue.filter(t => t.followUp.date === tomorrow)) },
-      { title: 'End of week', cls: '',
-        items: sortByDue(withDue.filter(inWeek)) },
-      { title: 'Future', cls: '',
-        items: sortByDue(withDue.filter(t => t.followUp.date > tomorrow && !inWeek(t))) },
-      { title: 'Delegated without follow-up', cls: 'nudge',
-        items: vis.filter(t => !t.done && t.sorted && t.urgent && !t.important && !t.followUp),
-        note: 'You delegated these but set no date to check back. Out of sight, out of mind.' }
-    ];
-
-    let any = false;
-    groups.forEach(g => {
-      if (g.items.length === 0) return;
-      any = true;
-      const wrap = document.createElement('div');
-      wrap.className = 'fu-group ' + g.cls;
-      const h = document.createElement('h2');
-      h.textContent = g.title;
-      wrap.appendChild(h);
-      if (g.note) {
-        const n = document.createElement('div');
-        n.className = 'fu-note';
-        n.textContent = g.note;
-        wrap.appendChild(n);
-      }
-      const ul = document.createElement('ul');
-      g.items.forEach(t => ul.appendChild(makeListRow(t)));
-      wrap.appendChild(ul);
-      viewFollowups.appendChild(wrap);
-    });
-
-    if (!any) {
-      const e = document.createElement('div');
-      e.className = 'empty';
-      e.textContent = 'No follow-ups. Add one with the follow-up chip on any task.';
-      viewFollowups.appendChild(e);
-    }
-  }
-
-  /* ---------- Rendering: radar ---------- */
-  function makeRadarCard(r) {
-    const card = document.createElement('div');
-    card.className = 'r-card ctx-' + r.context + ' ' + freshness(r);
-
-    const age = document.createElement('span');
-    age.className = 'r-age';
-    age.textContent = ageLabel(r);
-
-    const actions = document.createElement('div');
-    actions.className = 'r-actions';
-
-    const touch = document.createElement('button');
-    touch.className = 'r-btn touch';
-    touch.textContent = 'Check in';
-    touch.addEventListener('click', () => {
-      openCheckin = openCheckin === r.id ? null : r.id;
-      openHistory = null;
-      render();
-    });
-
-    const promote = document.createElement('button');
-    promote.className = 'r-btn promote';
-    promote.textContent = '\u2192 Task';
-    promote.setAttribute('aria-label', 'Promote to task');
-    promote.addEventListener('click', () => {
-      tasks.push({
-        id: nextId++, text: r.text, done: false,
-        context: r.context,
-        urgent: false, important: false, sorted: false,
-        followUp: null
-      });
-      radar = radar.filter(x => x.id !== r.id);
-      render();
-    });
-
-    const del = document.createElement('button');
-    del.className = 'del';
-    del.textContent = '\u00d7';
-    del.setAttribute('aria-label', 'Remove from radar');
-    del.addEventListener('click', () => { radar = radar.filter(x => x.id !== r.id); render(); });
-
-    actions.append(touch, promote, del);
-
-    card.append(makeGrip(r, 'radar'), makeText(r));
-    if (scope === 'both') card.append(makeCtxTag(r));
-    card.append(age, actions);
-
-    if (openCheckin === r.id) {
-      const form = document.createElement('div');
-      form.className = 'r-checkin';
-      const note = document.createElement('input');
-      note.type = 'text';
-      note.placeholder = 'Optional note \u2014 what did you see or decide?';
-      note.setAttribute('aria-label', 'Check-in note');
-      const save = document.createElement('button');
-      save.textContent = 'Log check-in';
-      const doLog = () => {
-        r.log.push({ date: todayStr(), note: note.value.trim() });
-        openCheckin = null;
-        render();
-      };
-      save.addEventListener('click', doLog);
-      note.addEventListener('keydown', e => { if (e.key === 'Enter') doLog(); });
-      form.append(note, save);
-      card.append(form);
-      setTimeout(() => note.focus(), 0);
-    }
-
-    if (r.log.length > 0) {
-      const hist = document.createElement('button');
-      hist.className = 'r-history';
-      hist.textContent = openHistory === r.id ? 'Hide history'
-        : r.log.length + (r.log.length === 1 ? ' check-in' : ' check-ins');
-      hist.addEventListener('click', () => {
-        openHistory = openHistory === r.id ? null : r.id;
-        openCheckin = null;
-        render();
-      });
-      card.append(hist);
-    }
-
-    if (openHistory === r.id) {
-      const logEl = document.createElement('div');
-      logEl.className = 'r-log';
-      [...r.log].reverse().forEach(entry => {
-        const e = document.createElement('div');
-        e.className = 'r-log-entry';
-        const b = document.createElement('b');
-        b.textContent = fmtDate(entry.date);
-        e.append(b, document.createTextNode(entry.note ? ' \u2014 ' + entry.note : ' \u2014 checked in'));
-        logEl.appendChild(e);
-      });
-      card.append(logEl);
-    }
-
-    return card;
-  }
-
-  function renderRadar() {
-    viewRadar.innerHTML = '';
-    const vis = radar.filter(inScope);
-
-    const summary = document.createElement('div');
-    summary.className = 'radar-summary';
-    const stale = vis.filter(r => freshness(r) === 'stale').length;
-    summary.textContent = vis.length === 0 ? '' :
-      vis.length + ' on the radar' + (stale > 0 ? ' \u00b7 ' + stale + ' untouched for 3+ weeks' : ' \u00b7 all recently touched');
-    viewRadar.appendChild(summary);
-
-    STAGES.forEach(s => {
-      const zone = document.createElement('div');
-      zone.className = 'stage-zone';
-      zone.dataset.stage = s.key;
-
-      const h = document.createElement('h2');
-      h.textContent = s.title;
-      const sub = document.createElement('div');
-      sub.className = 'stage-sub';
-      sub.textContent = s.sub;
-      zone.append(h, sub);
-
-      const items = vis.filter(r => r.stage === s.key)
-        .sort((a, b) => touchAge(b) - touchAge(a)); // most neglected first
-      if (items.length === 0) {
-        const e = document.createElement('div');
-        e.className = 'q-empty';
-        e.textContent = 'Nothing here \u2014 drag a card or add one above';
-        zone.appendChild(e);
-      } else {
-        items.forEach(r => zone.appendChild(makeRadarCard(r)));
-      }
-      viewRadar.appendChild(zone);
-    });
-  }
-
-  /* ---------- Persistence: local cache + Dropbox sync ---------- */
-  const STORE_KEY = 'eisenhower-todo-v1';
-  const DBX_FILE = '/tasks-data.json';
-  let storageOk = false;
-
-  // Dropbox connection state (kept in localStorage on each device)
-  const dbx = {
-    get appKey()       { return localStorage.getItem('dbx-app-key') || ''; },
-    set appKey(v)      { localStorage.setItem('dbx-app-key', v); },
-    get refreshToken() { return localStorage.getItem('dbx-refresh') || ''; },
-    set refreshToken(v){ v ? localStorage.setItem('dbx-refresh', v) : localStorage.removeItem('dbx-refresh'); },
-    accessToken: '',
-    accessExpiry: 0
-  };
-
-  let dbxState = dbx.refreshToken ? 'connected' : 'off';  // off | connected | syncing | error
-  let dbxTimer = null;
-  let lastSyncAt = null;
-
-  function applyData(data) {
-    if (Array.isArray(data.tasks)) tasks = data.tasks;
-    if (Array.isArray(data.radar)) radar = data.radar;
-    if (typeof data.nextId === 'number') nextId = data.nextId;
-  }
-
-  const serialize = () => JSON.stringify({ tasks, radar, nextId }, null, 2);
-
-  /* --- OAuth 2 with PKCE (no secret needed in the browser) --- */
-  function b64url(bytes) {
+    renderStatus();
+  },
+
+  flush() {
+    if (Store._timer) { clearTimeout(Store._timer); Store.syncUp(); }
+  },
+
+  /* ---- OAuth 2 with PKCE (no secret ever ships in this page) ---- */
+  _b64url(bytes) {
     return btoa(String.fromCharCode(...new Uint8Array(bytes)))
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  }
+  },
 
-  async function startDropboxAuth() {
-    const verifierBytes = crypto.getRandomValues(new Uint8Array(48));
-    const verifier = b64url(verifierBytes);
+  async startAuth() {
+    const verifier = Store._b64url(crypto.getRandomValues(new Uint8Array(48)));
     sessionStorage.setItem('dbx-verifier', verifier);
-    const challenge = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
+    const challenge = Store._b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
     const redirect = location.origin + location.pathname;
-    const url = 'https://www.dropbox.com/oauth2/authorize'
-      + '?client_id=' + encodeURIComponent(dbx.appKey)
-      + '&response_type=code'
-      + '&code_challenge=' + challenge
-      + '&code_challenge_method=S256'
-      + '&token_access_type=offline'
+    location.href = 'https://www.dropbox.com/oauth2/authorize'
+      + '?client_id=' + encodeURIComponent(Store.appKey)
+      + '&response_type=code&code_challenge=' + challenge
+      + '&code_challenge_method=S256&token_access_type=offline'
       + '&redirect_uri=' + encodeURIComponent(redirect);
-    location.href = url;
-  }
+  },
 
-  async function tokenRequest(params) {
+  async _token(params) {
     const res = await fetch('https://api.dropboxapi.com/oauth2/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1623,185 +845,748 @@
     });
     if (!res.ok) throw new Error('token request failed: ' + res.status);
     return res.json();
-  }
+  },
 
-  async function finishDropboxAuth() {
+  /** Handle the ?code=… redirect back from the Dropbox consent screen. */
+  async finishAuth() {
     const code = new URLSearchParams(location.search).get('code');
     if (!code) return false;
     const verifier = sessionStorage.getItem('dbx-verifier');
-    history.replaceState(null, '', location.pathname); // clean the URL
+    history.replaceState(null, '', location.pathname);
     if (!verifier) return false;
     try {
-      const data = await tokenRequest({
-        code, grant_type: 'authorization_code',
-        code_verifier: verifier,
-        client_id: dbx.appKey,
-        redirect_uri: location.origin + location.pathname
+      const d = await Store._token({
+        code, grant_type: 'authorization_code', code_verifier: verifier,
+        client_id: Store.appKey, redirect_uri: location.origin + location.pathname
       });
-      dbx.refreshToken = data.refresh_token;
-      dbx.accessToken = data.access_token;
-      dbx.accessExpiry = Date.now() + (data.expires_in - 60) * 1000;
-      dbxState = 'connected';
+      Store.refreshToken = d.refresh_token;
+      Store.accessToken = d.access_token;
+      Store.accessExpiry = Date.now() + (d.expires_in - 60) * 1000;
+      Store.state = 'connected';
       return true;
-    } catch (e) {
-      dbxState = 'error';
-      return false;
-    }
-  }
+    } catch (e) { Store.state = 'error'; return false; }
+  },
 
-  async function getAccessToken() {
-    if (dbx.accessToken && Date.now() < dbx.accessExpiry) return dbx.accessToken;
-    const data = await tokenRequest({
-      grant_type: 'refresh_token',
-      refresh_token: dbx.refreshToken,
-      client_id: dbx.appKey
+  async _access() {
+    if (Store.accessToken && Date.now() < Store.accessExpiry) return Store.accessToken;
+    const d = await Store._token({
+      grant_type: 'refresh_token', refresh_token: Store.refreshToken, client_id: Store.appKey
     });
-    dbx.accessToken = data.access_token;
-    dbx.accessExpiry = Date.now() + (data.expires_in - 60) * 1000;
-    return dbx.accessToken;
-  }
+    Store.accessToken = d.access_token;
+    Store.accessExpiry = Date.now() + (d.expires_in - 60) * 1000;
+    return Store.accessToken;
+  },
 
-  async function dropboxDownload() {
-    const token = await getAccessToken();
+  async _download() {
+    const token = await Store._access();
     const res = await fetch('https://content.dropboxapi.com/2/files/download', {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Dropbox-API-Arg': JSON.stringify({ path: DBX_FILE })
-      }
+      headers: { 'Authorization': 'Bearer ' + token, 'Dropbox-API-Arg': JSON.stringify({ path: Store.DBX_FILE }) }
     });
-    if (res.status === 409) return null; // file doesn't exist yet — first run
+    if (res.status === 409) return null;                 // no file yet: first run
     if (!res.ok) throw new Error('download failed: ' + res.status);
     return res.text();
-  }
+  },
 
-  async function dropboxUpload() {
-    const token = await getAccessToken();
+  async _upload() {
+    const token = await Store._access();
     const res = await fetch('https://content.dropboxapi.com/2/files/upload', {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token,
-        'Dropbox-API-Arg': JSON.stringify({ path: DBX_FILE, mode: 'overwrite', mute: true }),
+        'Dropbox-API-Arg': JSON.stringify({ path: Store.DBX_FILE, mode: 'overwrite', mute: true }),
         'Content-Type': 'application/octet-stream'
       },
-      body: serialize()
+      body: Store.serialize()
     });
     if (!res.ok) throw new Error('upload failed: ' + res.status);
-  }
+  },
 
-  async function dropboxSyncDown() {
-    if (dbxState === 'off') return;
+  /** On boot: the Dropbox copy wins over the local cache. */
+  async syncDown() {
+    if (!Store.refreshToken) return;
     try {
-      dbxState = 'syncing'; updateStatus();
-      const text = await dropboxDownload();
-      if (text && text.trim()) applyData(JSON.parse(text));
-      else await dropboxUpload();           // nothing remote yet: seed it with local data
-      lastSyncAt = new Date();
-      dbxState = 'connected';
-    } catch (e) {
-      dbxState = 'error';
-    }
-    updateStatus();
-  }
+      Store.state = 'syncing'; renderStatus();
+      const text = await Store._download();
+      if (text && text.trim()) migrate(JSON.parse(text));
+      else await Store._upload();                        // seed remote with local data
+      Store.lastSyncAt = new Date();
+      Store.state = 'connected';
+    } catch (e) { Store.state = 'error'; }
+    renderStatus();
+  },
 
-  async function dropboxSyncUp() {
-    if (dbxState === 'off' || !dbx.refreshToken) return;
+  async syncUp() {
+    if (!Store.refreshToken) return;
     try {
-      dbxState = 'syncing'; updateStatus();
-      await dropboxUpload();
-      lastSyncAt = new Date();
-      dbxState = 'connected';
-    } catch (e) {
-      dbxState = 'error';
+      Store.state = 'syncing'; renderStatus();
+      await Store._upload();
+      Store.lastSyncAt = new Date();
+      Store.state = 'connected';
+    } catch (e) { Store.state = 'error'; }
+    renderStatus();
+  },
+
+  disconnect() {
+    Store.refreshToken = '';
+    Store.accessToken = '';
+    Store.state = 'off';
+    renderStatus();
+  }
+};
+
+/* =========================================================================
+   6. DRAG CONTROLLER
+   Pointer-events based so it works with mouse and touch alike. Tasks drop
+   on .quadrant zones, radar items on .stage-zone zones.
+   ========================================================================= */
+const Drag = {
+  active: null,
+
+  start(e, item, kind, gripEl) {
+    e.preventDefault();
+    gripEl.setPointerCapture(e.pointerId);
+    const ghost = el('div', { class: 'drag-ghost', text: item.text });
+    document.body.appendChild(ghost);
+    const sourceRow = gripEl.closest('.task, .r-card');
+    if (sourceRow) sourceRow.classList.add('dragging-source');
+    Drag.active = { item, kind, ghost, sourceRow };
+    Drag._move(e.clientX, e.clientY);
+    gripEl.addEventListener('pointermove', Drag._onMove);
+    gripEl.addEventListener('pointerup', Drag._onEnd);
+    gripEl.addEventListener('pointercancel', Drag._onEnd);
+  },
+
+  _move(x, y) {
+    Drag.active.ghost.style.left = (x + 12) + 'px';
+    Drag.active.ghost.style.top = (y - 14) + 'px';
+  },
+
+  _zoneAt(x, y) {
+    Drag.active.ghost.style.display = 'none';
+    const hit = document.elementFromPoint(x, y);
+    Drag.active.ghost.style.display = '';
+    if (!hit) return null;
+    return Drag.active.kind === 'radar' ? hit.closest('.stage-zone') : hit.closest('.quadrant');
+  },
+
+  _onMove(e) {
+    if (!Drag.active) return;
+    Drag._move(e.clientX, e.clientY);
+    const z = Drag._zoneAt(e.clientX, e.clientY);
+    document.querySelectorAll('.quadrant, .stage-zone').forEach(n =>
+      n.classList.toggle('drop-target', n === z));
+  },
+
+  _onEnd(e) {
+    if (!Drag.active) return;
+    const { item, kind, ghost, sourceRow } = Drag.active;
+    const z = Drag._zoneAt(e.clientX, e.clientY);
+    if (z) {
+      if (kind === 'radar') {
+        if (z.dataset.stage) item.stage = z.dataset.stage;
+      } else {
+        const q = QUADRANTS.find(x => z.classList.contains('q-' + x.key));
+        if (q) {
+          item.urgent = q.urgent;
+          item.important = q.important;
+          item.sorted = true;
+          // Delegation without a check-back date is how things die quietly:
+          if (q.key === 'delegate' && !item.followUp) S.ui.openDateEditor = item.id;
+        }
+      }
     }
-    updateStatus();
+    ghost.remove();
+    if (sourceRow) sourceRow.classList.remove('dragging-source');
+    document.querySelectorAll('.drop-target').forEach(n => n.classList.remove('drop-target'));
+    Drag.active = null;
+    render();
   }
+};
 
-  function scheduleDropboxUpload() {
-    if (!dbx.refreshToken) return;
-    clearTimeout(dbxTimer);
-    dbxTimer = setTimeout(dropboxSyncUp, 1200);
+/* =========================================================================
+   7. COMPONENTS — small factories that return DOM nodes
+   ========================================================================= */
+
+function Check(item, { small = false, label = 'task' } = {}) {
+  return el('button', {
+    class: 'check',
+    'aria-label': (item.done ? 'Mark ' : 'Complete ') + label,
+    html: CHECK_SVG,
+    onclick: () => { item.done = !item.done; render(); }
+  });
+}
+
+/** Text that turns into an inline editor when tapped. */
+function EditableText(item) {
+  if (S.ui.openEdit === item.id) {
+    const inp = el('input', { class: 'edit-input', type: 'text', value: item.text, 'aria-label': 'Edit text' });
+    const commit = () => {
+      if (S.ui.openEdit !== item.id) return;             // already cancelled
+      const v = inp.value.trim();
+      if (v) item.text = v;
+      S.ui.openEdit = null;
+      render();
+    };
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') { S.ui.openEdit = null; render(); }
+    });
+    inp.addEventListener('blur', commit);
+    setTimeout(() => { inp.focus(); inp.select(); }, 0);
+    return inp;
   }
+  return el('span', {
+    class: 'text', text: item.text, title: 'Tap to edit',
+    onclick: () => { S.ui.openEdit = item.id; render(); }
+  });
+}
 
-  function disconnectDropbox() {
-    dbx.refreshToken = '';
-    dbx.accessToken = '';
-    dbxState = 'off';
-    updateStatus();
-  }
+function CtxTag(item) {
+  const w = item.context === 'work';
+  return el('span', { class: 'ctx-tag ' + (w ? 'w' : 'p'), text: w ? 'Work' : 'Private' });
+}
 
-  function updateStatus() {
-    const s = document.getElementById('storageStatus');
-    const btn = document.getElementById('dbxBtn');
-    const dis = document.getElementById('dbxDisconnect');
-    if (!s) return;
+function Grip(item, kind) {
+  return el('button', {
+    class: 'grip', html: GRIP_SVG,
+    'aria-label': kind === 'radar' ? 'Drag to a stage' : 'Drag to a quadrant',
+    onpointerdown: e => Drag.start(e, item, kind, e.currentTarget)
+  });
+}
 
-    btn.hidden = !!dbx.refreshToken;
-    dis.hidden = !dbx.refreshToken;
+function UrgentImportantChips(t) {
+  const mk = (key, label, cls) => el('button', {
+    class: 'flag ' + cls + (t[key] ? ' on' : ''), text: label, 'aria-pressed': String(t[key]),
+    onclick: () => { t[key] = !t[key]; t.sorted = true; render(); }
+  });
+  return [mk('urgent', 'Urgent', 'u'), mk('important', 'Important', 'i')];
+}
 
-    const counts = tasks.length + ' tasks, ' + radar.length + ' radar items';
-    if (dbx.refreshToken) {
-      if (dbxState === 'syncing') s.textContent = 'Syncing with Dropbox\u2026';
-      else if (dbxState === 'error') s.textContent = '\u26a0 Dropbox sync failed \u2014 data is safe on this device and will retry on your next change';
-      else s.textContent = 'Synced with Dropbox' + (lastSyncAt ? ' at ' + lastSyncAt.toTimeString().slice(0,5) : '') + ' \u00b7 ' + counts;
-    } else if (storageOk) {
-      s.textContent = 'Saved on this device only \u00b7 ' + counts;
-    } else {
-      s.textContent = 'Auto-save unavailable here \u2014 host this file and open it in a browser';
-    }
-  }
-
-  function saveData() {
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify({ tasks, radar, nextId }));
-      storageOk = true;
-    } catch (e) {
-      storageOk = false;
-    }
-    scheduleDropboxUpload();
-    updateStatus();
-  }
-
-  function loadData() {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (raw) applyData(JSON.parse(raw));
-    } catch (e) { /* start fresh */ }
-  }
-
-  /* --- Wiring --- */
-  document.getElementById('dbxBtn').addEventListener('click', () => {
-    if (!dbx.appKey) {
-      document.getElementById('dbxSetup').hidden = false;
-      document.getElementById('dbxKeyInput').focus();
-    } else {
-      startDropboxAuth();
+function FollowChip(t) {
+  const status = Follow.status(t);
+  return el('button', {
+    class: 'flag f' + (t.followUp ? ' on' : '') + (status ? ' ' + status : ''),
+    text: t.followUp ? (status === 'overdue' ? '\u26a0 ' : '') + Follow.chipLabel(t.followUp, t.context) : '+ Follow up',
+    onclick: () => {
+      S.ui.openDateEditor = S.ui.openDateEditor === t.id ? null : t.id;
+      render();
     }
   });
+}
 
-  document.getElementById('dbxKeySave').addEventListener('click', () => {
-    const key = document.getElementById('dbxKeyInput').value.trim();
+/** Two-mode follow-up editor: "Later today" (time) / "Pick a date" (quick picks + custom). */
+function FollowEditor(current, ctx, onDone) {
+  const bToday = el('button', { text: 'Later today' });
+  const bDate = el('button', { text: 'Pick a date' });
+
+  const timeInput = el('input', { type: 'time', 'aria-label': 'Follow-up time today',
+    value: current && current.time ? current.time : '' });
+  timeInput.addEventListener('change', () => {
+    if (timeInput.value) onDone({ date: Cal.today(), time: timeInput.value });
+  });
+
+  const quick = el('div', { class: 'quick-dates' },
+    Cal.quickOptions(ctx).map(o => el('button', {
+      onclick: () => onDone({ date: o.date, time: null })
+    }, o.label, el('small', { text: Cal.fmt(o.date) + ' \u00b7 ' + Cal.remainingLabel(o.date, ctx) }))));
+
+  const dateInput = el('input', { type: 'date', 'aria-label': 'Custom follow-up date',
+    value: current && !current.time ? current.date : '' });
+  dateInput.addEventListener('change', () => {
+    if (!dateInput.value) return;
+    let date = dateInput.value;
+    if (ctx === 'work' && Cal.isWeekend(date)) date = Cal.rollToMonday(date);  // work has no weekends
+    onDone({ date, time: null });
+  });
+
+  function setMode(m, openPicker) {
+    bToday.classList.toggle('active', m === 'today');
+    bDate.classList.toggle('active', m === 'date');
+    timeInput.style.display = m === 'today' ? '' : 'none';
+    quick.style.display = m === 'date' ? '' : 'none';
+    dateInput.style.display = m === 'date' ? '' : 'none';
+    if (openPicker && m === 'today') setTimeout(() => {
+      timeInput.focus();
+      if (timeInput.showPicker) { try { timeInput.showPicker(); } catch (e) {} }
+    }, 0);
+  }
+
+  bToday.addEventListener('click', () => setMode('today', true));
+  bDate.addEventListener('click', () => setMode('date', true));
+  setMode(current && !current.time ? 'date' : 'today', false);
+
+  return el('div', { class: 'date-pop' },
+    el('div', { class: 'mode-toggle' }, bToday, bDate),
+    timeInput, quick, dateInput,
+    el('button', { class: 'clear-date', text: 'Clear', onclick: () => onDone(null) }));
+}
+
+function TaskFollowEditor(t) {
+  return FollowEditor(t.followUp, t.context, f => {
+    t.followUp = f;
+    S.ui.openDateEditor = null;
+    render();
+  });
+}
+
+/* ---- Subtasks ---- */
+
+function SubChip(t) {
+  const { total, done } = Subs.stats(t);
+  return el('button', {
+    class: 'flag sc' + (total > 0 ? (done === total ? ' complete' : ' on') : ''),
+    text: total > 0 ? done + '/' + total : '+ Sub',
+    'aria-label': total > 0 ? done + ' of ' + total + ' subtasks done' : 'Add subtasks',
+    onclick: () => {
+      const set = S.ui.openSubs;
+      set.has(t.id) ? set.delete(t.id) : set.add(t.id);
+      render();
+    }
+  });
+}
+
+function SubPanel(t) {
+  const rows = t.subs.map(s => el('div', { class: 'sub-row' + (s.done ? ' done' : '') },
+    Check(s, { small: true, label: 'subtask' }),
+    EditableText(s),
+    el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Delete subtask',
+      onclick: () => { t.subs = t.subs.filter(x => x.id !== s.id); render(); } })));
+
+  const inp = el('input', { type: 'text', placeholder: 'Add a subtask\u2026', 'aria-label': 'New subtask' });
+  const add = () => {
+    const v = inp.value.trim();
+    if (!v) return;
+    t.subs.push({ id: 's' + uid(), text: v, done: false });
+    S.ui.pendingSubFocus = t.id;   // keep the keyboard flowing on mobile
+    render();
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+
+  if (S.ui.pendingSubFocus === t.id) {
+    S.ui.pendingSubFocus = null;
+    setTimeout(() => inp.focus(), 0);
+  }
+
+  return el('div', { class: 'sub-panel' }, rows,
+    el('div', { class: 'sub-add' }, inp, el('button', { text: 'Add', onclick: add })));
+}
+
+/* ---- The one task row, used by every task-bearing view ----
+   opts: { grip:boolean, compact:boolean, chips:boolean, deletable:boolean } */
+function TaskRow(t, opts = {}) {
+  const { grip = false, compact = false, chips = true, deletable = true } = opts;
+  const row = el('div', {
+    class: 'task ctx-' + t.context + (t.done ? ' done' : '') + (compact ? ' compact' : '')
+  });
+
+  if (grip) row.append(Grip(t, 'task'));
+  row.append(Check(t), EditableText(t));
+  if (S.ui.scope === 'both') row.append(CtxTag(t));
+
+  if (chips) {
+    row.append(el('div', { class: 'flags' }, UrgentImportantChips(t), SubChip(t), FollowChip(t)));
+  } else {
+    row.append(el('div', { class: 'flags' }, SubChip(t), FollowChip(t)));
+  }
+
+  if (deletable) row.append(el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Delete task',
+    onclick: () => { S.data.tasks = S.data.tasks.filter(x => x.id !== t.id); render(); } }));
+
+  if (S.ui.openDateEditor === t.id) row.append(TaskFollowEditor(t));
+  if (S.ui.openSubs.has(t.id)) row.append(SubPanel(t));
+  return row;
+}
+
+/* =========================================================================
+   8. VIEWS — each returns a DOM node for the view host.
+   Adding a view = add an entry to Views and a pill in VIEW_PILLS.
+   ========================================================================= */
+const Views = {
+
+  list() {
+    return el('div', { class: 'tasks' }, visibleTasks().map(t => TaskRow(t)));
+  },
+
+  matrix() {
+    const vis = visibleTasks();
+
+    const grid = el('div', { class: 'matrix' }, QUADRANTS.map(q => {
+      const items = vis.filter(t => t.sorted && t.urgent === q.urgent && t.important === q.important);
+      return el('div', { class: 'quadrant q-' + q.key },
+        el('div', { class: 'q-title', text: q.title }),
+        el('div', { class: 'q-sub', text: q.sub }),
+        items.length === 0
+          ? el('div', { class: 'zone-empty', text: 'Nothing here' })
+          : items.map(t => TaskRow(t, { grip: true, compact: true, chips: false })));
+    }));
+
+    const unsorted = vis.filter(t => !t.sorted);
+    const unsortedBlock = unsorted.length === 0 ? null :
+      el('div', { class: 'unsorted' },
+        el('h2', { text: 'Unsorted \u2014 drag into a quadrant' }),
+        el('div', { class: 'tasks' }, unsorted.map(t => TaskRow(t, { grip: true, chips: false }))));
+
+    return el('div', {}, grid, unsortedBlock);
+  },
+
+  followups() {
+    const vis = visibleTasks();
+    const today = Cal.today();
+    const now = new Date();
+    const tomorrow = Cal.addDays(1);
+
+    const withDue = vis.filter(t => !t.done && t.followUp);
+    const byDue = arr => arr.sort((a, b) => Follow.dueMoment(a.followUp) - Follow.dueMoment(b.followUp));
+    // "End of week" honours each task's own calendar: Friday for work, Sunday for private
+    const inWeek = t => t.followUp.date > tomorrow && t.followUp.date <= Cal.weekEndFor(t.context);
+
+    const groups = [
+      { title: 'Overdue', cls: 'overdue', items: byDue(withDue.filter(t => Follow.dueMoment(t.followUp) < now)) },
+      { title: 'Today', cls: 'today', items: byDue(withDue.filter(t => Follow.dueMoment(t.followUp) >= now && t.followUp.date === today)) },
+      { title: 'Tomorrow', cls: '', items: byDue(withDue.filter(t => t.followUp.date === tomorrow)) },
+      { title: 'End of week', cls: '', items: byDue(withDue.filter(inWeek)) },
+      { title: 'Future', cls: '', items: byDue(withDue.filter(t => t.followUp.date > tomorrow && !inWeek(t))) },
+      { title: 'Delegated without follow-up', cls: 'nudge',
+        items: vis.filter(t => !t.done && t.sorted && t.urgent && !t.important && !t.followUp),
+        note: 'You delegated these but set no date to check back. Out of sight, out of mind.' }
+    ].filter(g => g.items.length > 0);
+
+    if (groups.length === 0) {
+      return el('div', { class: 'empty', text: 'No follow-ups. Add one with the follow-up chip on any task.' });
+    }
+
+    return el('div', {}, groups.map(g =>
+      el('div', { class: 'fu-group ' + g.cls },
+        el('h2', { text: g.title }),
+        g.note ? el('div', { class: 'fu-note', text: g.note }) : null,
+        el('div', { class: 'tasks' }, g.items.map(t => TaskRow(t))))));
+  },
+
+  radar() {
+    const vis = S.data.radar.filter(inScope);
+    const stale = vis.filter(r => Radar.freshness(r) === 'stale').length;
+
+    const summary = vis.length === 0 ? null :
+      el('div', { class: 'radar-summary',
+        text: vis.length + ' on the radar' +
+          (stale > 0 ? ' \u00b7 ' + stale + ' untouched for 3+ weeks' : ' \u00b7 all recently touched') });
+
+    return el('div', {}, summary, STAGES.map(stage => {
+      const items = vis.filter(r => r.stage === stage.key)
+        .sort((a, b) => Radar.age(b) - Radar.age(a));   // most neglected first
+      return el('div', { class: 'stage-zone', dataset: { stage: stage.key } },
+        el('h2', { text: stage.title }),
+        el('div', { class: 'stage-sub', text: stage.sub }),
+        items.length === 0
+          ? el('div', { class: 'zone-empty', text: 'Nothing here \u2014 drag a card or add one above' })
+          : items.map(RadarCard));
+    }));
+  }
+};
+
+function RadarCard(r) {
+  const card = el('div', { class: 'r-card ctx-' + r.context + ' ' + Radar.freshness(r) },
+    Grip(r, 'radar'),
+    EditableText(r),
+    S.ui.scope === 'both' ? CtxTag(r) : null,
+    el('span', { class: 'r-age', text: Radar.ageLabel(r) }),
+    el('div', { class: 'r-actions' },
+      el('button', { class: 'r-btn touch', text: 'Check in', onclick: () => {
+        S.ui.openCheckin = S.ui.openCheckin === r.id ? null : r.id;
+        S.ui.openHistory = null;
+        render();
+      } }),
+      el('button', { class: 'r-btn promote', text: '\u2192 Task', 'aria-label': 'Promote to task', onclick: () => {
+        S.data.tasks.push({
+          id: uid(), text: r.text, done: false, context: r.context,
+          urgent: false, important: false, sorted: false, followUp: null, subs: []
+        });
+        S.data.radar = S.data.radar.filter(x => x.id !== r.id);
+        render();
+      } }),
+      el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Remove from radar', onclick: () => {
+        S.data.radar = S.data.radar.filter(x => x.id !== r.id);
+        render();
+      } })));
+
+  if (S.ui.openCheckin === r.id) {
+    const note = el('input', { type: 'text',
+      placeholder: 'Optional note \u2014 what did you see or decide?', 'aria-label': 'Check-in note' });
+    const log = () => {
+      r.log.push({ date: Cal.today(), note: note.value.trim() });
+      S.ui.openCheckin = null;
+      render();
+    };
+    note.addEventListener('keydown', e => { if (e.key === 'Enter') log(); });
+    card.append(el('div', { class: 'r-checkin' }, note, el('button', { text: 'Log check-in', onclick: log })));
+    setTimeout(() => note.focus(), 0);
+  }
+
+  if (r.log.length > 0) {
+    card.append(el('button', { class: 'r-history',
+      text: S.ui.openHistory === r.id ? 'Hide history' : r.log.length + (r.log.length === 1 ? ' check-in' : ' check-ins'),
+      onclick: () => {
+        S.ui.openHistory = S.ui.openHistory === r.id ? null : r.id;
+        S.ui.openCheckin = null;
+        render();
+      } }));
+  }
+
+  if (S.ui.openHistory === r.id) {
+    card.append(el('div', { class: 'r-log' }, [...r.log].reverse().map(entry =>
+      el('div', { class: 'r-log-entry' },
+        el('b', { text: Cal.fmt(entry.date) }),
+        ' \u2014 ' + (entry.note || 'checked in')))));
+  }
+
+  return card;
+}
+
+/* =========================================================================
+   9. COMPOSER — the add bar adapts to the active view:
+   task chips normally, stage chips in the Radar view.
+   ========================================================================= */
+const Composer = {
+
+  add() {
+    const input = $('input');
+    const text = input.value.trim();
+    if (!text) return;
+    const c = S.ui.composer;
+
+    if (S.ui.view === 'radar') {
+      S.data.radar.push({
+        id: 'r' + uid(), text, context: c.context, stage: c.stage,
+        created: Cal.today(), log: []
+      });
+    } else {
+      S.data.tasks.push({
+        id: uid(), text, done: false, context: c.context,
+        urgent: c.urgent, important: c.important,
+        sorted: c.urgent || c.important,
+        followUp: c.follow, subs: []
+      });
+      c.urgent = false; c.important = false; c.follow = null;
+      $('composerFollowPop').hidden = true;
+    }
+    input.value = '';
+    Composer.render();
+    input.focus();
+    render();
+  },
+
+  setContext(ctx) {
+    const c = S.ui.composer;
+    if (c.context !== ctx) {
+      c.context = ctx;
+      // A date picked under private rules may be a weekend — illegal for work
+      if (c.follow && !c.follow.time && ctx === 'work' && Cal.isWeekend(c.follow.date)) {
+        c.follow = { date: Cal.rollToMonday(c.follow.date), time: null };
+      }
+      $('composerFollowPop').hidden = true;
+    }
+    Composer.render();
+  },
+
+  toggleFollowEditor() {
+    const pop = $('composerFollowPop');
+    if (pop.hidden) {
+      pop.hidden = false;
+      pop.innerHTML = '';
+      pop.append(FollowEditor(S.ui.composer.follow, S.ui.composer.context, f => {
+        S.ui.composer.follow = f;
+        pop.hidden = true;
+        Composer.render();
+      }));
+    } else {
+      pop.hidden = true;
+    }
+  },
+
+  render() {
+    const c = S.ui.composer;
+    const radarMode = S.ui.view === 'radar';
+    const host = $('composerFlags');
+    host.innerHTML = '';
+
+    host.append(
+      el('button', { class: 'flag cw' + (c.context === 'work' ? ' on' : ''), text: 'Work',
+        'aria-pressed': String(c.context === 'work'), onclick: () => Composer.setContext('work') }),
+      el('button', { class: 'flag cp' + (c.context === 'private' ? ' on' : ''), text: 'Private',
+        'aria-pressed': String(c.context === 'private'), onclick: () => Composer.setContext('private') }),
+      el('span', { class: 'sep' }));
+
+    if (radarMode) {
+      $('composerFollowPop').hidden = true;
+      host.append(...STAGES.map(s =>
+        el('button', { class: 'flag st' + (c.stage === s.key ? ' on' : ''), text: s.title,
+          'aria-pressed': String(c.stage === s.key),
+          onclick: () => { c.stage = s.key; Composer.render(); } })));
+    } else {
+      const mk = (key, label, cls) => el('button', {
+        class: 'flag ' + cls + (c[key] ? ' on' : ''), text: label, 'aria-pressed': String(c[key]),
+        onclick: () => { c[key] = !c[key]; Composer.render(); }
+      });
+      host.append(
+        mk('urgent', 'Urgent', 'u'),
+        mk('important', 'Important', 'i'),
+        el('button', { class: 'flag f' + (c.follow ? ' on' : ''),
+          text: c.follow ? 'Follow up ' + Follow.chipLabel(c.follow, c.context) : 'Follow up',
+          'aria-pressed': String(!!c.follow), onclick: Composer.toggleFollowEditor }));
+
+      const target = c.urgent && c.important ? 'Do now' : c.important ? 'Schedule' : c.urgent ? 'Delegate' : '';
+      if (target) host.append(el('span', { class: 'composer-target', text: '\u2192 ' + target }));
+    }
+
+    $('input').placeholder = radarMode ? 'Add to radar\u2026' : 'Add a task\u2026';
+  }
+};
+
+/* =========================================================================
+   10. SHELL — scope, pills, header, status line, master render
+   ========================================================================= */
+const VIEW_PILLS = [
+  { key: 'list', label: 'List' },
+  { key: 'matrix', label: 'Matrix' },
+  { key: 'followups', label: 'Follow-ups' },
+  { key: 'radar', label: 'Radar' }
+];
+
+const FILTER_PILLS = [
+  { key: 'all', label: 'All' },
+  { key: 'active', label: 'Active' },
+  { key: 'done', label: 'Done' }
+];
+
+function renderShell() {
+  // scope segmented control
+  document.querySelectorAll('#scope button').forEach(b => {
+    b.className = b.dataset.scope === S.ui.scope ? 'active-' + S.ui.scope : '';
+  });
+
+  // view pills (Follow-ups gets a red dot when anything is overdue)
+  const overdue = S.data.tasks.filter(inScope).filter(t => Follow.status(t) === 'overdue').length;
+  const vp = $('viewPills');
+  vp.innerHTML = '';
+  vp.append(...VIEW_PILLS.map(p =>
+    el('button', { class: p.key === S.ui.view ? 'active' : '', onclick: () => {
+      S.ui.view = p.key;
+      Composer.render();
+      render();
+    } }, p.label, (p.key === 'followups' && overdue > 0) ? el('span', { class: 'dot' }) : null)));
+
+  // filter pills (hidden in radar — no done state there)
+  const fp = $('filterPills');
+  fp.style.visibility = S.ui.view === 'radar' ? 'hidden' : '';
+  fp.innerHTML = '';
+  fp.append(...FILTER_PILLS.map(p =>
+    el('button', { class: p.key === S.ui.filter ? 'active' : '',
+      onclick: () => { S.ui.filter = p.key; render(); } }, p.label)));
+
+  // header count line
+  const scoped = S.data.tasks.filter(inScope);
+  const remaining = scoped.filter(t => !t.done).length;
+  const doNow = scoped.filter(t => !t.done && t.urgent && t.important).length;
+  const count = $('count');
+  count.innerHTML = '';
+  if (scoped.length > 0) {
+    count.append(remaining === 0 ? 'All done' :
+      remaining + (remaining === 1 ? ' task remaining' : ' tasks remaining') +
+      (doNow > 0 ? ' \u00b7 ' + doNow + ' to do now' : ''));
+    if (overdue > 0) count.append(el('span', { class: 'overdue-note', text: ' \u00b7 ' + overdue + ' overdue' }));
+  }
+}
+
+function renderStatus() {
+  const s = $('storageStatus');
+  if (!s) return;
+  $('dbxBtn').hidden = !!Store.refreshToken;
+  $('dbxDisconnect').hidden = !Store.refreshToken;
+
+  const counts = S.data.tasks.length + ' tasks, ' + S.data.radar.length + ' radar items';
+  if (Store.refreshToken) {
+    if (Store.state === 'syncing') s.textContent = 'Syncing with Dropbox\u2026';
+    else if (Store.state === 'error') s.textContent = '\u26a0 Dropbox sync failed \u2014 data is safe on this device and will retry on your next change';
+    else s.textContent = 'Synced with Dropbox' +
+      (Store.lastSyncAt ? ' at ' + Store.lastSyncAt.toTimeString().slice(0, 5) : '') + ' \u00b7 ' + counts;
+  } else if (Store.localOk) {
+    s.textContent = 'Saved on this device only \u00b7 ' + counts;
+  } else {
+    s.textContent = 'Auto-save unavailable here \u2014 host this file and open it in a browser';
+  }
+}
+
+function renderEmpty() {
+  const e = $('emptyMsg');
+  let show = false, msg = '';
+  if (S.ui.view === 'radar') {
+    show = S.data.radar.filter(inScope).length === 0;
+    msg = 'Nothing on your radar yet. Add something above \u2014 no date needed.';
+  } else if (S.ui.view !== 'followups') {
+    show = visibleTasks().length === 0;
+    const scopeName = S.ui.scope === 'both' ? '' : S.ui.scope + ' ';
+    msg = S.data.tasks.filter(inScope).length === 0
+      ? 'No ' + scopeName + 'tasks yet. Add your first above.'
+      : S.ui.filter === 'done'
+        ? 'No completed ' + scopeName + 'tasks yet.'
+        : 'No active ' + scopeName + 'tasks \u2014 nice work.';
+  }
+  e.hidden = !show;
+  if (show) e.textContent = msg;
+}
+
+/** The one render: shell + active view + empty state + persist. */
+function render() {
+  renderShell();
+  const host = $('viewHost');
+  host.innerHTML = '';
+  host.append(Views[S.ui.view]());
+  renderEmpty();
+  Store.save();
+}
+
+/* =========================================================================
+   11. WIRING & BOOT
+   ========================================================================= */
+function wire() {
+  $('addBtn').addEventListener('click', Composer.add);
+  $('input').addEventListener('keydown', e => { if (e.key === 'Enter') Composer.add(); });
+
+  document.querySelectorAll('#scope button').forEach(b =>
+    b.addEventListener('click', () => {
+      S.ui.scope = b.dataset.scope;
+      if (S.ui.scope !== 'both') Composer.setContext(S.ui.scope);
+      render();
+    }));
+
+  $('dbxBtn').addEventListener('click', () => {
+    if (!Store.appKey) {
+      $('dbxSetup').hidden = false;
+      $('dbxKeyInput').focus();
+    } else Store.startAuth();
+  });
+
+  $('dbxKeySave').addEventListener('click', () => {
+    const key = $('dbxKeyInput').value.trim();
     if (!key) return;
-    dbx.appKey = key;
-    document.getElementById('dbxSetup').hidden = true;
-    startDropboxAuth();
+    Store.appKey = key;
+    $('dbxSetup').hidden = true;
+    Store.startAuth();
   });
 
-  document.getElementById('dbxDisconnect').addEventListener('click', disconnectDropbox);
+  $('dbxDisconnect').addEventListener('click', () => Store.disconnect());
 
-  document.getElementById('exportBtn').addEventListener('click', () => {
-    const blob = new Blob([serialize()], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'tasks-backup-' + todayStr() + '.json';
+  $('exportBtn').addEventListener('click', () => {
+    const blob = new Blob([Store.serialize()], { type: 'application/json' });
+    const a = el('a', { href: URL.createObjectURL(blob), download: 'tasks-backup-' + Cal.today() + '.json' });
     a.click();
     URL.revokeObjectURL(a.href);
   });
 
-  document.getElementById('importBtn').addEventListener('click', () =>
-    document.getElementById('importFile').click());
+  $('importBtn').addEventListener('click', () => $('importFile').click());
 
-  document.getElementById('importFile').addEventListener('change', e => {
+  $('importFile').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
@@ -1809,7 +1594,7 @@
       try {
         const data = JSON.parse(reader.result);
         if (!Array.isArray(data.tasks) || !Array.isArray(data.radar)) throw new Error('bad shape');
-        applyData(data);
+        migrate(data);
         render();
       } catch (err) {
         alert('That file doesn\u2019t look like a backup from this app.');
@@ -1819,76 +1604,32 @@
     reader.readAsText(file);
   });
 
-  // Flush any pending upload when the app is backgrounded or closed
+  // Flush pending uploads when leaving; keep countdowns fresh once a minute,
+  // but never re-render out from under an open editor, drag, or keyboard.
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && dbxTimer) {
-      clearTimeout(dbxTimer);
-      dropboxSyncUp();
-    }
+    if (document.visibilityState === 'hidden') Store.flush();
   });
 
-  /* ---------- Master render ---------- */
-  function render() {
-    if (view === 'list') renderList();
-    else if (view === 'matrix') renderMatrix();
-    else if (view === 'followups') renderFollowups();
-    else renderRadar();
-
-    const scoped = tasks.filter(inScope);
-    const remaining = scoped.filter(t => !t.done).length;
-    const doNow = scoped.filter(t => !t.done && t.urgent && t.important).length;
-    const overdue = scoped.filter(t => followStatus(t) === 'overdue').length;
-
-    let line = scoped.length === 0 ? '' :
-      remaining === 0 ? 'All done' :
-      remaining + (remaining === 1 ? ' task remaining' : ' tasks remaining') +
-      (doNow > 0 ? ' \u00b7 ' + doNow + ' to do now' : '');
-    count.innerHTML = '';
-    count.append(document.createTextNode(line));
-    if (overdue > 0) {
-      const s = document.createElement('span');
-      s.className = 'overdue-note';
-      s.textContent = ' \u00b7 ' + overdue + ' overdue';
-      count.appendChild(s);
-    }
-
-    fuPill.innerHTML = 'Follow-ups';
-    if (overdue > 0) {
-      const dot = document.createElement('span');
-      dot.className = 'dot';
-      fuPill.appendChild(dot);
-    }
-
-    let anyVisible;
-    if (view === 'followups') anyVisible = true;
-    else if (view === 'radar') anyVisible = radar.filter(inScope).length > 0;
-    else anyVisible = visibleTasks().length > 0;
-
-    empty.hidden = anyVisible;
-    if (!empty.hidden) {
-      if (view === 'radar') {
-        empty.textContent = 'Nothing on your radar yet. Add something above \u2014 no date needed.';
-      } else {
-        const scopeName = scope === 'both' ? '' : scope + ' ';
-        empty.textContent = tasks.filter(inScope).length === 0 ? 'No ' + scopeName + 'tasks yet. Add your first above.' :
-          filter === 'done' ? 'No completed ' + scopeName + 'tasks yet.' : 'No active ' + scopeName + 'tasks \u2014 nice work.';
-      }
-    }
-    saveData();
-  }
-
   setInterval(() => {
-    if (!drag && openDateEditor === null && openCheckin === null && document.visibilityState === 'visible') render();
+    const typing = document.activeElement && document.activeElement.tagName === 'INPUT';
+    const busy = Drag.active || S.ui.openDateEditor !== null || S.ui.openCheckin !== null ||
+                 S.ui.openEdit !== null || typing;
+    if (!busy && document.visibilityState === 'visible') render();
   }, 60000);
+}
 
-  (async function init() {
-    loadData();                    // fast start from the local cache
-    syncComposer();
+(async function boot() {
+  Store.loadLocal();                       // instant start from cache
+  wire();
+  Composer.render();
+  render();
+  await Store.finishAuth();                // returning from Dropbox consent?
+  if (Store.refreshToken) {
+    Store.state = 'connected';
+    await Store.syncDown();                // Dropbox copy wins over cache
     render();
-    const justConnected = await finishDropboxAuth();  // returning from the Dropbox consent screen?
-    if (dbx.refreshToken) await dropboxSyncDown();    // Dropbox copy wins over the local cache
-    if (justConnected) render(); else if (dbx.refreshToken) render();
-  })();
+  }
+})();
 </script>
 </body>
 </html>
