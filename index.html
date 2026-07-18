@@ -76,6 +76,7 @@
   .scope button.active-work { background: var(--slate); color: #fff; }
   .scope button.active-private { background: var(--clay); color: #fff; }
   .scope button.active-both { background: var(--charcoal); color: #fff; }
+  .scope button.active-groceries { background: var(--teal); color: #fff; }
 
   /* =====================================================================
      COMPOSER
@@ -489,6 +490,43 @@
   .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
   /* =====================================================================
+     GROCERIES
+     ===================================================================== */
+  .g-card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 4px solid var(--teal); border-radius: 12px;
+    padding: 13px 15px; margin-bottom: 10px;
+  }
+
+  .g-card.past { opacity: 0.6; }
+  .g-card.complete { border-left-color: var(--muted); }
+
+  .g-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .g-title { font-size: 15px; font-weight: 600; flex: 1; min-width: 0; }
+  .g-progress { font-size: 12px; color: var(--muted); }
+  .g-progress.full { color: var(--teal); font-weight: 600; }
+  .g-head-actions { display: flex; align-items: center; gap: 5px; }
+  .g-card .del { opacity: 1; }
+  .g-items { margin-top: 6px; }
+  .g-card .note-panel, .g-card .sub-add { padding-left: 0; }
+  .g-card .note-panel { margin-top: 8px; }
+
+  .flag.gl.on { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+  .g-date {
+    font-size: 13px; padding: 6px 9px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: var(--surface); color: var(--charcoal);
+  }
+
+  .pantry-item { border-left-color: var(--teal); }
+
+  .move-chooser {
+    width: 100%; display: flex; gap: 6px; flex-wrap: wrap;
+    padding-top: 8px; border-top: 1px dashed var(--line); margin-top: 4px;
+  }
+
+  /* =====================================================================
      MISC & FOOTER
      ===================================================================== */
   .empty { text-align: center; padding: 48px 0; color: var(--muted); font-size: 15px; }
@@ -551,6 +589,7 @@
   <div class="scope" id="scope" role="tablist" aria-label="Work or private tasks">
     <button data-scope="work" class="active-work">Work</button>
     <button data-scope="private">Private</button>
+    <button data-scope="groceries">Groceries</button>
     <button data-scope="both">Both</button>
   </div>
 
@@ -665,6 +704,7 @@ const Cal = {
   thisFriday()  { return Cal._weekday(4); },
   nextFriday()  { return Cal._weekday(4, 1); },
   thisSunday()  { return Cal._weekday(6); },
+  thisSaturday() { return Cal._weekday(5); },
   nextSunday()  { return Cal._weekday(6, 1); },
   /** The date that closes "this week" for a given context. */
   weekEndFor(ctx) { return ctx === 'work' ? Cal.thisFriday() : Cal.thisSunday(); },
@@ -818,7 +858,7 @@ const Subs = {
    S.ui is transient per-session state.
    ========================================================================= */
 const S = {
-  data: { tasks: [], radar: [], nextId: 1 },
+  data: { tasks: [], radar: [], groceryLists: [], pantry: [], nextId: 1 },
   ui: {
     scope: 'work',            // work | private | both
     view: 'list',             // list | matrix | followups | radar
@@ -830,7 +870,8 @@ const S = {
     openSubs: new Set(),      // task ids with subtask panel expanded
     openNotes: new Set(),     // task ids with note panel expanded
     pendingSubFocus: null,    // refocus add-subtask input after render
-    composer: { context: 'work', urgent: false, important: false, follow: null, stage: 'watching' }
+    openMoveTo: null,         // pantry item id with the move-to-list chooser open
+    composer: { context: 'work', urgent: false, important: false, follow: null, stage: 'watching', gdate: null }
   }
 };
 
@@ -838,6 +879,8 @@ const S = {
 function migrate(data) {
   if (Array.isArray(data.tasks)) S.data.tasks = data.tasks;
   if (Array.isArray(data.radar)) S.data.radar = data.radar;
+  if (Array.isArray(data.groceryLists)) S.data.groceryLists = data.groceryLists;
+  if (Array.isArray(data.pantry)) S.data.pantry = data.pantry;
   if (typeof data.nextId === 'number') S.data.nextId = data.nextId;
   for (const t of S.data.tasks) {
     if (!Array.isArray(t.subs)) t.subs = [];
@@ -847,6 +890,11 @@ function migrate(data) {
     // excluded from trend charts rather than faked.
     if (t.createdAt === undefined) t.createdAt = null;
     if (t.completedAt === undefined) t.completedAt = null;
+  }
+  for (const g of S.data.groceryLists) {
+    if (!Array.isArray(g.items)) g.items = [];
+    if (typeof g.note !== 'string') g.note = '';
+    if (typeof g.name !== 'string') g.name = '';
   }
   for (const r of S.data.radar) {
     if (!Array.isArray(r.log)) r.log = [];
@@ -1443,6 +1491,61 @@ const Views = {
           stat('Stale on radar', staleRadar, true))));
   },
 
+  /* ---- Groceries: dated lists ---- */
+  glists() {
+    const today = Cal.today();
+    const lists = [...S.data.groceryLists];
+    const upcoming = lists.filter(g => g.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+    const past = lists.filter(g => g.date < today).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+
+    if (lists.length === 0) return el('div', {});
+
+    return el('div', {},
+      upcoming.map(g => GroceryListCard(g, false)),
+      past.length > 0 ? el('div', { class: 'unsorted' },
+        el('h2', { text: 'Past lists' }),
+        past.map(g => GroceryListCard(g, true))) : null);
+  },
+
+  /* ---- Groceries: the running "remember along the way" pool ---- */
+  gbuy() {
+    const items = S.data.pantry;
+    if (items.length === 0) return el('div', {});
+    const today = Cal.today();
+    const upcomingLists = S.data.groceryLists
+      .filter(g => g.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    return el('div', { class: 'tasks' }, items.map(item => {
+      const row = el('div', { class: 'task pantry-item' },
+        EditableText(item),
+        el('span', { class: 'r-age', text: 'added ' + Cal.fmt(item.added) }),
+        el('div', { class: 'flags' },
+          el('button', { class: 'flag gl', text: '\u2192 List', 'aria-label': 'Move to a shopping list',
+            onclick: () => {
+              S.ui.openMoveTo = S.ui.openMoveTo === item.id ? null : item.id;
+              render();
+            } })),
+        el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Remove item',
+          onclick: () => { S.data.pantry = S.data.pantry.filter(x => x.id !== item.id); render(); } }));
+
+      if (S.ui.openMoveTo === item.id) {
+        row.append(el('div', { class: 'move-chooser' },
+          upcomingLists.length === 0
+            ? el('span', { class: 'zone-empty', text: 'No upcoming list yet \u2014 create one under Lists first' })
+            : upcomingLists.map(g => el('button', { class: 'flag',
+                text: GroceryTitle(g),
+                onclick: () => {
+                  g.items.push({ id: 's' + uid(), text: item.text, done: false });
+                  S.data.pantry = S.data.pantry.filter(x => x.id !== item.id);
+                  S.ui.openMoveTo = null;
+                  render();
+                } }))));
+      }
+      return row;
+    }));
+  },
+
   radar() {
     const vis = S.data.radar.filter(inScope);
     const stale = vis.filter(r => Radar.freshness(r) === 'stale').length;
@@ -1517,6 +1620,58 @@ function Legend(series) {
       el('span', { class: 'swatch', style: 'background:' + sr.color }), sr.label)));
 }
 
+function GroceryTitle(g) {
+  const base = g.name || 'Shopping';
+  const dd = Cal.dayDiff(g.date);
+  const when = dd === 0 ? 'today' : dd === 1 ? 'tomorrow' : dd > 1 ? 'in ' + dd + ' d' : (-dd) + ' d ago';
+  return base + ' \u00b7 ' + Cal.fmt(g.date) + ' \u00b7 ' + when;
+}
+
+function GroceryListCard(g, isPast) {
+  const total = g.items.length;
+  const done = g.items.filter(i => i.done).length;
+  const complete = total > 0 && done === total;
+
+  const card = el('div', { class: 'g-card' + (isPast ? ' past' : '') + (complete ? ' complete' : '') },
+    el('div', { class: 'g-head' },
+      el('span', { class: 'g-title', text: GroceryTitle(g) }),
+      total > 0 ? el('span', { class: 'g-progress' + (complete ? ' full' : ''),
+        text: complete ? '\u2713 complete' : done + '/' + total }) : null,
+      el('div', { class: 'g-head-actions' },
+        NoteChip(g),
+        el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Delete list',
+          onclick: () => {
+            S.data.groceryLists = S.data.groceryLists.filter(x => x.id !== g.id);
+            render();
+          } }))));
+
+  if (S.ui.openNotes.has(g.id)) card.append(NotePanel(g));
+
+  card.append(el('div', { class: 'g-items' },
+    g.items.map(i => el('div', { class: 'sub-row' + (i.done ? ' done' : '') },
+      Check(i, { small: true, label: 'item' }),
+      EditableText(i),
+      el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Remove item',
+        onclick: () => { g.items = g.items.filter(x => x.id !== i.id); render(); } })))));
+
+  // add-item row (also on past lists — forgotten items happen)
+  const inp = el('input', { type: 'text', placeholder: 'Add an item\u2026', 'aria-label': 'New item' });
+  const add = () => {
+    const v = inp.value.trim();
+    if (!v) return;
+    g.items.push({ id: 's' + uid(), text: v, done: false });
+    S.ui.pendingSubFocus = g.id;
+    render();
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+  if (S.ui.pendingSubFocus === g.id) {
+    S.ui.pendingSubFocus = null;
+    setTimeout(() => inp.focus(), 0);
+  }
+  card.append(el('div', { class: 'sub-add' }, inp, el('button', { text: 'Add', onclick: add })));
+  return card;
+}
+
 function RadarCard(r) {
   const card = el('div', { class: 'r-card ctx-' + r.context + ' ' + Radar.freshness(r) },
     Grip(r, 'radar'),
@@ -1584,10 +1739,34 @@ const Composer = {
   add() {
     const input = $('input');
     const text = input.value.trim();
-    if (!text) return;
+    if (!text && S.ui.view !== 'glists') return;   // a new grocery list only needs a date
     const c = S.ui.composer;
+    if (S.ui.view === 'glists') input.value = '';
 
-    if (S.ui.view === 'radar') {
+    if (S.ui.view === 'glists') {
+      S.data.groceryLists.push({
+        id: 'g' + uid(), name: text === '' ? '' : text,
+        date: c.gdate || Cal.today(), items: [], note: ''
+      });
+      c.gdate = null;
+      Composer.render();
+      render();
+      return;
+    }
+    if (S.ui.view === 'gbuy') {
+      S.data.pantry.push({ id: 'p' + uid(), text, added: Cal.today() });
+      input.value = '';
+      input.focus();
+      render();
+      return;
+    }
+    if (S.ui.view === 'glists') {
+    show = S.data.groceryLists.length === 0;
+    msg = 'No shopping lists yet. Pick a day above and tap New list.';
+  } else if (S.ui.view === 'gbuy') {
+    show = S.data.pantry.length === 0;
+    msg = 'Nothing to remember yet. Add items as they occur to you \u2014 move them to a list when shopping day comes.';
+  } else if (S.ui.view === 'radar') {
       S.data.radar.push({
         id: 'r' + uid(), text, context: c.context, stage: c.stage,
         created: Cal.today(), log: []
@@ -1646,6 +1825,44 @@ const Composer = {
     // Trends is read-only: no composer there
     document.querySelector('.composer').style.display = S.ui.view === 'trends' ? 'none' : '';
 
+    if (S.ui.view === 'gbuy') {
+      $('composerFollowPop').hidden = true;
+      $('input').placeholder = 'Add an item to remember\u2026';
+      $('addBtn').textContent = 'Add';
+      return;
+    }
+    if (S.ui.view === 'glists') {
+      $('composerFollowPop').hidden = true;
+      $('input').placeholder = 'List name (optional) \u2014 pick the shopping day\u2026';
+      $('addBtn').textContent = 'New list';
+      const day = (label, date) => el('button', {
+        class: 'flag gl' + (c.gdate === date ? ' on' : ''),
+        text: label + ' \u00b7 ' + Cal.fmt(date),
+        onclick: () => { c.gdate = date; Composer.render(); }
+      });
+      const opts = [
+        ['Today', Cal.today()], ['Tomorrow', Cal.addDays(1)],
+        ['Saturday', Cal.thisSaturday()], ['Sunday', Cal.thisSunday()]
+      ];
+      // Colliding days merge labels (e.g. on a Saturday: "Today \u00b7 Saturday")
+      const byDate = new Map();
+      for (const [label, date] of opts) {
+        if (date < Cal.today()) continue;
+        if (byDate.has(date)) byDate.set(date, byDate.get(date) + ' \u00b7 ' + label);
+        else byDate.set(date, label);
+      }
+      for (const [date, label] of byDate) host.append(day(label, date));
+      const custom = el('input', { type: 'date', 'aria-label': 'Shopping day', class: 'g-date' });
+      if (c.gdate) custom.value = c.gdate;
+      custom.addEventListener('change', () => {
+        if (custom.value) { c.gdate = custom.value; Composer.render(); }
+      });
+      host.append(custom);
+      if (!c.gdate) c.gdate = Cal.today();   // sensible default so New list always works
+      return;
+    }
+    $('addBtn').textContent = 'Add';
+
     host.append(
       el('button', { class: 'flag cw' + (c.context === 'work' ? ' on' : ''), text: 'Work',
         'aria-pressed': String(c.context === 'work'), onclick: () => Composer.setContext('work') }),
@@ -1682,13 +1899,20 @@ const Composer = {
 /* =========================================================================
    10. SHELL — scope, pills, header, status line, master render
    ========================================================================= */
-const VIEW_PILLS = [
+const TASK_PILLS = [
   { key: 'list', label: 'List' },
   { key: 'matrix', label: 'Matrix' },
   { key: 'followups', label: 'Follow-ups' },
   { key: 'radar', label: 'Radar' },
   { key: 'trends', label: 'Trends' }
 ];
+
+const GROCERY_PILLS = [
+  { key: 'glists', label: 'Lists' },
+  { key: 'gbuy', label: 'To buy' }
+];
+
+const pillsForScope = () => S.ui.scope === 'groceries' ? GROCERY_PILLS : TASK_PILLS;
 
 const FILTER_PILLS = [
   { key: 'all', label: 'All' },
@@ -1706,7 +1930,7 @@ function renderShell() {
   const overdue = S.data.tasks.filter(inScope).filter(t => Follow.status(t) === 'overdue').length;
   const vp = $('viewPills');
   vp.innerHTML = '';
-  vp.append(...VIEW_PILLS.map(p => {
+  vp.append(...pillsForScope().map(p => {
     const extra = (p.key === 'followups' && overdue > 0) ? el('span', { class: 'dot' }) : null;
     return el('button', { class: p.key === S.ui.view ? 'active' : '', onclick: () => {
       S.ui.view = p.key;
@@ -1717,13 +1941,21 @@ function renderShell() {
 
   // filter pills (hidden in radar — no done state there)
   const fp = $('filterPills');
-  fp.style.visibility = ['radar', 'trends'].includes(S.ui.view) ? 'hidden' : '';
+  fp.style.visibility = ['radar', 'trends', 'glists', 'gbuy'].includes(S.ui.view) ? 'hidden' : '';
   fp.innerHTML = '';
   fp.append(...FILTER_PILLS.map(p =>
     el('button', { class: p.key === S.ui.filter ? 'active' : '',
       onclick: () => { S.ui.filter = p.key; render(); } }, p.label)));
 
   // header count line
+  if (S.ui.scope === 'groceries') {
+    const nLists = S.data.groceryLists.filter(g => g.date >= Cal.today()).length;
+    const nBuy = S.data.pantry.length;
+    $('count').textContent = (nLists + nBuy) === 0 ? '' :
+      nLists + (nLists === 1 ? ' upcoming list' : ' upcoming lists') +
+      ' \u00b7 ' + nBuy + (nBuy === 1 ? ' item to buy' : ' items to buy');
+    return;
+  }
   const scoped = S.data.tasks.filter(inScope);
   const remaining = scoped.filter(t => !t.done).length;
   const doNow = scoped.filter(t => !t.done && t.urgent && t.important).length;
@@ -1759,7 +1991,13 @@ function renderStatus() {
 function renderEmpty() {
   const e = $('emptyMsg');
   let show = false, msg = '';
-  if (S.ui.view === 'radar') {
+  if (S.ui.view === 'glists') {
+    show = S.data.groceryLists.length === 0;
+    msg = 'No shopping lists yet. Pick a day above and tap New list.';
+  } else if (S.ui.view === 'gbuy') {
+    show = S.data.pantry.length === 0;
+    msg = 'Nothing to remember yet. Add items as they occur to you \u2014 move them to a list when shopping day comes.';
+  } else if (S.ui.view === 'radar') {
     show = S.data.radar.filter(inScope).length === 0;
     msg = 'Nothing on your radar yet. Add something above \u2014 no date needed.';
   } else if (S.ui.view !== 'followups') {
@@ -1794,8 +2032,12 @@ function wire() {
 
   document.querySelectorAll('#scope button').forEach(b =>
     b.addEventListener('click', () => {
+      const was = S.ui.scope;
       S.ui.scope = b.dataset.scope;
-      if (S.ui.scope !== 'both') Composer.setContext(S.ui.scope);
+      if (S.ui.scope === 'groceries' && was !== 'groceries') S.ui.view = 'glists';
+      if (S.ui.scope !== 'groceries' && was === 'groceries') S.ui.view = 'list';
+      if (['work', 'private'].includes(S.ui.scope)) Composer.setContext(S.ui.scope);
+      Composer.render();
       render();
     }));
 
