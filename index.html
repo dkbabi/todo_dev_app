@@ -296,6 +296,40 @@
   }
 
   /* =====================================================================
+     NOTES
+     ===================================================================== */
+  .flag.nt.on { background: var(--grey-soft); border-color: var(--muted); color: var(--charcoal); }
+
+  .note-panel { width: 100%; padding-left: 34px; position: relative; }
+
+  .note-box {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 9px 11px 22px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--bg);
+    color: var(--charcoal);
+    outline: none;
+    resize: vertical;
+  }
+
+  .note-box:focus { border-color: var(--teal); }
+
+  .note-count {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .note-count.full { color: var(--clay); font-weight: 600; }
+
+  /* =====================================================================
      MATRIX VIEW
      ===================================================================== */
   .matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -722,6 +756,9 @@ const Radar = {
   }
 };
 
+/** Character cap for task notes — change this one number to adjust. */
+const NOTE_MAX = 280;
+
 const Subs = {
   stats(t) {
     const subs = t.subs || [];
@@ -745,6 +782,7 @@ const S = {
     openCheckin: null,        // radar id with check-in form open
     openHistory: null,        // radar id with history expanded
     openSubs: new Set(),      // task ids with subtask panel expanded
+    openNotes: new Set(),     // task ids with note panel expanded
     pendingSubFocus: null,    // refocus add-subtask input after render
     composer: { context: 'work', urgent: false, important: false, follow: null, stage: 'watching' }
   }
@@ -758,6 +796,7 @@ function migrate(data) {
   for (const t of S.data.tasks) {
     if (!Array.isArray(t.subs)) t.subs = [];
     if (!t.context) t.context = 'work';
+    if (typeof t.note !== 'string') t.note = '';
   }
   for (const r of S.data.radar) {
     if (!Array.isArray(r.log)) r.log = [];
@@ -1172,6 +1211,41 @@ function SubPanel(t) {
     el('div', { class: 'sub-add' }, inp, el('button', { text: 'Add', onclick: add })));
 }
 
+/* ---- Notes ---- */
+
+function NoteChip(t) {
+  const has = t.note.length > 0;
+  return el('button', {
+    class: 'flag nt' + (has ? ' on' : ''),
+    text: has ? 'Note' : '+ Note',
+    'aria-label': has ? 'View note' : 'Add a note',
+    onclick: () => {
+      const set = S.ui.openNotes;
+      set.has(t.id) ? set.delete(t.id) : set.add(t.id);
+      render();
+    }
+  });
+}
+
+function NotePanel(t) {
+  // The textarea writes straight into state on input (no re-render, so the
+  // keyboard never loses focus); the debounced Store.save picks it up.
+  const counter = el('span', { class: 'note-count', text: t.note.length + '/' + NOTE_MAX });
+  const ta = el('textarea', {
+    class: 'note-box', maxlength: String(NOTE_MAX), rows: '3',
+    placeholder: 'A short note \u2014 context, links, who said what\u2026',
+    'aria-label': 'Task note'
+  });
+  ta.value = t.note;
+  ta.addEventListener('input', () => {
+    t.note = ta.value.slice(0, NOTE_MAX);
+    counter.textContent = t.note.length + '/' + NOTE_MAX;
+    counter.classList.toggle('full', t.note.length >= NOTE_MAX);
+    Store.save();
+  });
+  return el('div', { class: 'note-panel' }, ta, counter);
+}
+
 /* ---- The one task row, used by every task-bearing view ----
    opts: { grip:boolean, compact:boolean, chips:boolean, deletable:boolean } */
 function TaskRow(t, opts = {}) {
@@ -1185,15 +1259,16 @@ function TaskRow(t, opts = {}) {
   if (S.ui.scope === 'both') row.append(CtxTag(t));
 
   if (chips) {
-    row.append(el('div', { class: 'flags' }, UrgentImportantChips(t), SubChip(t), FollowChip(t)));
+    row.append(el('div', { class: 'flags' }, UrgentImportantChips(t), SubChip(t), NoteChip(t), FollowChip(t)));
   } else {
-    row.append(el('div', { class: 'flags' }, SubChip(t), FollowChip(t)));
+    row.append(el('div', { class: 'flags' }, SubChip(t), NoteChip(t), FollowChip(t)));
   }
 
   if (deletable) row.append(el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Delete task',
     onclick: () => { S.data.tasks = S.data.tasks.filter(x => x.id !== t.id); render(); } }));
 
   if (S.ui.openDateEditor === t.id) row.append(TaskFollowEditor(t));
+  if (S.ui.openNotes.has(t.id)) row.append(NotePanel(t));
   if (S.ui.openSubs.has(t.id)) row.append(SubPanel(t));
   return row;
 }
@@ -1300,7 +1375,7 @@ function RadarCard(r) {
       el('button', { class: 'r-btn promote', text: '\u2192 Task', 'aria-label': 'Promote to task', onclick: () => {
         S.data.tasks.push({
           id: uid(), text: r.text, done: false, context: r.context,
-          urgent: false, important: false, sorted: false, followUp: null, subs: []
+          urgent: false, important: false, sorted: false, followUp: null, subs: [], note: ''
         });
         S.data.radar = S.data.radar.filter(x => x.id !== r.id);
         render();
@@ -1365,7 +1440,7 @@ const Composer = {
         id: uid(), text, done: false, context: c.context,
         urgent: c.urgent, important: c.important,
         sorted: c.urgent || c.important,
-        followUp: c.follow, subs: []
+        followUp: c.follow, subs: [], note: ''
       });
       c.urgent = false; c.important = false; c.follow = null;
       $('composerFollowPop').hidden = true;
@@ -1611,7 +1686,7 @@ function wire() {
   });
 
   setInterval(() => {
-    const typing = document.activeElement && document.activeElement.tagName === 'INPUT';
+    const typing = document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
     const busy = Drag.active || S.ui.openDateEditor !== null || S.ui.openCheckin !== null ||
                  S.ui.openEdit !== null || typing;
     if (!busy && document.visibilityState === 'visible') render();
