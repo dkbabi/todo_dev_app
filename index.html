@@ -499,6 +499,9 @@
   }
 
   .g-card.past { opacity: 0.6; }
+  .g-card .g-head > .check { flex-shrink: 0; }
+  .g-card.done > .g-head > .check { background: var(--teal); border-color: var(--teal); }
+  .g-card.done .g-title { color: var(--muted); text-decoration: line-through; }
   .g-card.complete { border-left-color: var(--muted); }
 
   .g-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -912,6 +915,7 @@ function migrate(data) {
     if (!Array.isArray(g.items)) g.items = [];
     if (typeof g.note !== 'string') g.note = '';
     if (typeof g.name !== 'string') g.name = '';
+    if (typeof g.done !== 'boolean') g.done = false;
   }
   for (const r of S.data.radar) {
     if (!Array.isArray(r.log)) r.log = [];
@@ -1558,36 +1562,31 @@ const Views = {
         const chooser = el('div', { class: 'move-chooser' });
 
         if (S.ui.moveMode === null) {
-          // Outcome 1: join an existing list as a subtask
+          // Outcome 1: add as an item to an existing list
           if (upcomingLists.length > 0) {
-            chooser.append(el('span', { class: 'move-label', text: 'Add as item to:' }));
+            chooser.append(el('span', { class: 'move-label', text: 'Add \u201c' + item.text + '\u201d as an item to:' }));
             chooser.append(...upcomingLists.map(g => el('button', { class: 'flag',
               text: GroceryTitle(g),
               onclick: () => {
                 g.items.push({ id: 's' + uid(), text: item.text, done: false });
                 finish();
               } })));
+            chooser.append(el('span', { class: 'move-label', text: 'Or:' }));
+          } else {
+            chooser.append(el('span', { class: 'move-label', text: 'No list yet \u2014 create one to hold it:' }));
           }
-          // Outcomes 2 & 3: create something new for it
-          chooser.append(el('span', { class: 'move-label', text: upcomingLists.length > 0 ? 'Or:' : 'No upcoming list \u2014 create:' }));
-          chooser.append(
-            el('button', { class: 'flag gl', text: '+ New list holding it',
-              onclick: () => { S.ui.moveMode = 'newItem'; render(); } }),
-            el('button', { class: 'flag gl', text: '+ Own list (as title)',
-              onclick: () => { S.ui.moveMode = 'newTitle'; render(); } }));
+          // Outcome 2: create a new list, item rides in as its first sub-item
+          chooser.append(el('button', { class: 'flag gl', text: '+ New list',
+            onclick: () => { S.ui.moveMode = 'newItem'; render(); } }));
         } else {
-          // A creation mode is chosen: pick the day
+          // Creating a new list: pick the day; the item goes in as a sub-item
           const create = (date) => {
-            if (S.ui.moveMode === 'newTitle') {
-              S.data.groceryLists.push({ id: 'g' + uid(), name: item.text, date, items: [], note: '' });
-            } else {
-              S.data.groceryLists.push({ id: 'g' + uid(), name: '', date,
-                items: [{ id: 's' + uid(), text: item.text, done: false }], note: '' });
-            }
+            S.data.groceryLists.push({ id: 'g' + uid(), name: '', date, done: false,
+              items: [{ id: 's' + uid(), text: item.text, done: false }], note: '' });
             finish();
           };
           chooser.append(el('span', { class: 'move-label',
-            text: (S.ui.moveMode === 'newTitle' ? '\u201c' + item.text + '\u201d as its own list \u2014 which day?' : 'New list holding \u201c' + item.text + '\u201d \u2014 which day?') }));
+            text: 'New list with \u201c' + item.text + '\u201d \u2014 which day?' }));
           chooser.append(...Cal.shoppingDays().map(o =>
             el('button', { class: 'flag gl', text: o.label + ' \u00b7 ' + Cal.fmt(o.date),
               onclick: () => create(o.date) })));
@@ -1689,8 +1688,20 @@ function GroceryListCard(g, isPast) {
   const done = g.items.filter(i => i.done).length;
   const complete = total > 0 && done === total;
 
-  const card = el('div', { class: 'g-card' + (isPast ? ' past' : '') + (complete ? ' complete' : '') },
+  // The list carries its own done flag; ticking it also ticks every item.
+  const masterCheck = el('button', {
+    class: 'check', 'aria-label': g.done ? 'Mark list not done' : 'Mark whole list done',
+    html: CHECK_SVG,
+    onclick: () => {
+      g.done = !g.done;
+      g.items.forEach(i => i.done = g.done);
+      render();
+    }
+  });
+
+  const card = el('div', { class: 'g-card' + (isPast ? ' past' : '') + (g.done ? ' done' : '') + (complete ? ' complete' : '') },
     el('div', { class: 'g-head' },
+      masterCheck,
       el('span', { class: 'g-title', text: GroceryTitle(g) }),
       total > 0 ? el('span', { class: 'g-progress' + (complete ? ' full' : ''),
         text: complete ? '\u2713 complete' : done + '/' + total }) : null,
@@ -1704,9 +1715,20 @@ function GroceryListCard(g, isPast) {
 
   if (S.ui.openNotes.has(g.id)) card.append(NotePanel(g));
 
+  const itemCheck = i => el('button', {
+    class: 'check', 'aria-label': i.done ? 'Mark item not done' : 'Mark item done',
+    html: CHECK_SVG,
+    onclick: () => {
+      i.done = !i.done;
+      // Reconcile the master flag with the items' collective state
+      g.done = g.items.length > 0 && g.items.every(x => x.done);
+      render();
+    }
+  });
+
   card.append(el('div', { class: 'g-items' },
     g.items.map(i => el('div', { class: 'sub-row' + (i.done ? ' done' : '') },
-      Check(i, { small: true, label: 'item' }),
+      itemCheck(i),
       EditableText(i),
       el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Remove item',
         onclick: () => { g.items = g.items.filter(x => x.id !== i.id); render(); } })))));
@@ -1803,7 +1825,7 @@ const Composer = {
     if (S.ui.view === 'glists') {
       S.data.groceryLists.push({
         id: 'g' + uid(), name: text === '' ? '' : text,
-        date: c.gdate || Cal.today(), items: [], note: ''
+        date: c.gdate || Cal.today(), items: [], note: '', done: false
       });
       c.gdate = null;
       Composer.render();
