@@ -178,6 +178,25 @@
   .quick-dates button:hover { border-color: var(--slate); }
   .quick-dates button small { color: var(--muted); font-weight: 400; margin-left: 4px; }
 
+  .flag.cal.on { background: var(--slate-soft); border-color: var(--slate); color: var(--slate); }
+
+  .cal-panel {
+    width: 100%; padding-left: 34px; display: flex;
+    gap: 8px; flex-wrap: wrap; align-items: center;
+    padding-top: 8px; border-top: 1px dashed var(--line); margin-top: 4px;
+  }
+
+  .cal-hint { width: 100%; font-size: 12px; color: var(--muted); line-height: 1.45; }
+
+  .cal-btn {
+    font-size: 12px; font-weight: 600; padding: 7px 12px;
+    border: 1px solid var(--slate); border-radius: 999px;
+    background: var(--slate-soft); color: var(--slate); transition: all 0.15s;
+  }
+  .cal-btn:hover { background: var(--slate); color: #fff; }
+  .cal-btn.cancel { border-color: var(--line); background: transparent; color: var(--muted); }
+  .cal-btn.cancel:hover { border-color: var(--clay); color: var(--clay); background: transparent; }
+
   /* =====================================================================
      TOOLBAR (views + filters)
      ===================================================================== */
@@ -808,6 +827,70 @@ const STAGES = [
   { key: 'winding',   title: 'Winding down', sub: 'Letting go \u2014 confirm and close out' }
 ];
 
+/* iCalendar (.ics) export. One file works for Apple Calendar and Outlook.
+   Reusing a task's stable UID with an incremented SEQUENCE makes a re-import
+   replace the existing event instead of adding a duplicate. */
+const Ical = {
+  _stamp(d) {
+    const p = n => String(n).padStart(2, '0');
+    return d.getUTCFullYear() + p(d.getUTCMonth() + 1) + p(d.getUTCDate()) +
+      'T' + p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds()) + 'Z';
+  },
+  _esc(text) {
+    return String(text).replace(/\\/g, '\\\\').replace(/;/g, '\\;')
+      .replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  },
+  /** Local wall-clock start/end for a task's follow-up. Date-only -> 09:00, 30 min block. */
+  _range(f) {
+    const d = Cal.fromIso(f.date);
+    if (f.time) { const [hh, mm] = f.time.split(':').map(Number); d.setHours(hh, mm, 0, 0); }
+    else d.setHours(9, 0, 0, 0);                     // date-only reminder defaults to 9am
+    const end = new Date(d.getTime() + 30 * 60000);
+    return { start: d, end };
+  },
+  _local(d) {
+    const p = n => String(n).padStart(2, '0');
+    return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) +
+      'T' + p(d.getHours()) + p(d.getMinutes()) + '00';
+  },
+  /** Build a VCALENDAR string for one task; cancel=true removes the event. */
+  forTask(t, cancel) {
+    const f = t.followUp;
+    const { start, end } = Ical._range(f);
+    const now = Ical._stamp(new Date());
+    const lines = [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Tasks//EN',
+      'CALSCALE:GREGORIAN', 'METHOD:' + (cancel ? 'CANCEL' : 'PUBLISH'),
+      'BEGIN:VEVENT',
+      'UID:' + t.calUid,
+      'SEQUENCE:' + t.calSeq,
+      'DTSTAMP:' + now,
+      'DTSTART:' + Ical._local(start),
+      'DTEND:' + Ical._local(end),
+      'SUMMARY:' + Ical._esc((t.context === 'work' ? '[Work] ' : '[Private] ') + t.text),
+      'STATUS:' + (cancel ? 'CANCELLED' : 'CONFIRMED')
+    ];
+    if (t.note) lines.push('DESCRIPTION:' + Ical._esc(t.note));
+    if (!cancel) {
+      lines.push('BEGIN:VALARM', 'ACTION:DISPLAY',
+        'DESCRIPTION:' + Ical._esc(t.text), 'TRIGGER:-PT0M', 'END:VALARM');
+    }
+    lines.push('END:VEVENT', 'END:VCALENDAR');
+    return lines.join('\r\n');
+  },
+  /** Trigger a download of the .ics; bumps SEQUENCE so the next export supersedes this one. */
+  download(t, cancel) {
+    const ics = Ical.forTask(t, cancel);
+    t.calSeq = (t.calSeq || 0) + 1;                   // next export outranks this one
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (cancel ? 'cancel-' : '') + 'task-' + t.id + '.ics';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+};
+
 const Follow = {
   dueMoment(f) {
     const d = Cal.fromIso(f.date);
@@ -889,6 +972,7 @@ const S = {
     openSubs: new Set(),      // task ids with subtask panel expanded
     openNotes: new Set(),     // task ids with note panel expanded
     pendingSubFocus: null,    // refocus add-subtask input after render
+    openCal: null,            // task id with calendar actions expanded
     openMoveTo: null,         // pantry item id with the move-to-list chooser open
     moveMode: null,           // 'newItem' (fresh list holding it) | 'newTitle' (own list)
     composer: { context: 'work', urgent: false, important: false, follow: null, stage: 'watching', gdate: null }
@@ -910,6 +994,9 @@ function migrate(data) {
     // excluded from trend charts rather than faked.
     if (t.createdAt === undefined) t.createdAt = null;
     if (t.completedAt === undefined) t.completedAt = null;
+    // Stable calendar identity so re-exports UPDATE rather than duplicate.
+    if (!t.calUid) t.calUid = 'task-' + t.id + '-' + Math.random().toString(36).slice(2, 8) + '@tasks.local';
+    if (typeof t.calSeq !== 'number') t.calSeq = 0;
   }
   for (const g of S.data.groceryLists) {
     if (!Array.isArray(g.items)) g.items = [];
@@ -925,6 +1012,9 @@ function migrate(data) {
 }
 
 const uid = () => S.data.nextId++;
+
+/** Fresh calendar identity for a new task. */
+const newCalUid = id => 'task-' + id + '-' + Math.random().toString(36).slice(2, 8) + '@tasks.local';
 const inScope = x => S.ui.scope === 'both' || x.context === S.ui.scope;
 
 function visibleTasks() {
@@ -1289,8 +1379,41 @@ function TaskFollowEditor(t) {
   return FollowEditor(t.followUp, t.context, f => {
     t.followUp = f;
     S.ui.openDateEditor = null;
+    // Setting a date is the moment to offer the calendar, so reveal it here.
+    if (f) S.ui.openCal = t.id;
     render();
   });
+}
+
+/** Calendar chip: visible on the row itself whenever a follow-up is set. */
+function CalChip(t) {
+  if (!t.followUp) return null;
+  const exported = t.calSeq > 0;
+  const chip = el('button', {
+    class: 'flag cal' + (exported ? ' on' : ''),
+    text: exported ? '\u21bb Calendar' : '\u1f4c5 Calendar',
+    'aria-label': exported ? 'Update this event in your calendar' : 'Add this follow-up to your calendar',
+    onclick: () => {
+      S.ui.openCal = S.ui.openCal === t.id ? null : t.id;
+      render();
+    }
+  });
+  return chip;
+}
+
+/** Expanded calendar actions for one task. */
+function CalPanel(t) {
+  const exported = t.calSeq > 0;
+  return el('div', { class: 'cal-panel' },
+    el('span', { class: 'cal-hint',
+      text: exported
+        ? 'Re-download to update the existing event (no duplicate). On iPhone the file lands in Safari\u2019s downloads \u2014 tap it to open Calendar.'
+        : 'Downloads a calendar file for Apple Calendar or Outlook. On iPhone check Safari\u2019s downloads, then tap the file.' }),
+    el('button', { class: 'cal-btn',
+      text: exported ? '\u21bb Update calendar event' : '\u2193 Add to calendar',
+      onclick: () => { Ical.download(t, false); S.ui.openCal = t.id; render(); } }),
+    exported ? el('button', { class: 'cal-btn cancel', text: '\u2715 Remove from calendar',
+      onclick: () => { Ical.download(t, true); S.ui.openCal = t.id; render(); } }) : null);
 }
 
 /* ---- Subtasks ---- */
@@ -1383,15 +1506,16 @@ function TaskRow(t, opts = {}) {
   if (S.ui.scope === 'both') row.append(CtxTag(t));
 
   if (chips) {
-    row.append(el('div', { class: 'flags' }, UrgentImportantChips(t), SubChip(t), NoteChip(t), FollowChip(t)));
+    row.append(el('div', { class: 'flags' }, UrgentImportantChips(t), SubChip(t), NoteChip(t), FollowChip(t), CalChip(t)));
   } else {
-    row.append(el('div', { class: 'flags' }, SubChip(t), NoteChip(t), FollowChip(t)));
+    row.append(el('div', { class: 'flags' }, SubChip(t), NoteChip(t), FollowChip(t), CalChip(t)));
   }
 
   if (deletable) row.append(el('button', { class: 'del', text: '\u00d7', 'aria-label': 'Delete task',
     onclick: () => { S.data.tasks = S.data.tasks.filter(x => x.id !== t.id); render(); } }));
 
   if (S.ui.openDateEditor === t.id) row.append(TaskFollowEditor(t));
+  if (S.ui.openCal === t.id && t.followUp) row.append(CalPanel(t));
   if (S.ui.openNotes.has(t.id)) row.append(NotePanel(t));
   if (S.ui.openSubs.has(t.id)) row.append(SubPanel(t));
   return row;
@@ -1764,9 +1888,11 @@ function RadarCard(r) {
         render();
       } }),
       el('button', { class: 'r-btn promote', text: '\u2192 Task', 'aria-label': 'Promote to task', onclick: () => {
+        const ptid = uid();
         S.data.tasks.push({
-          id: uid(), text: r.text, done: false, context: r.context,
-          urgent: false, important: false, sorted: false, followUp: null, subs: [], note: ''
+          id: ptid, text: r.text, done: false, context: r.context,
+          urgent: false, important: false, sorted: false, followUp: null, subs: [], note: '',
+          createdAt: Cal.today(), completedAt: null, calUid: newCalUid(ptid), calSeq: 0
         });
         S.data.radar = S.data.radar.filter(x => x.id !== r.id);
         render();
@@ -1851,12 +1977,14 @@ const Composer = {
         created: Cal.today(), log: []
       });
     } else {
+      const tid = uid();
       S.data.tasks.push({
-        id: uid(), text, done: false, context: c.context,
+        id: tid, text, done: false, context: c.context,
         urgent: c.urgent, important: c.important,
         sorted: c.urgent || c.important,
         followUp: c.follow, subs: [], note: '',
-        createdAt: Cal.today(), completedAt: null
+        createdAt: Cal.today(), completedAt: null,
+        calUid: newCalUid(tid), calSeq: 0
       });
       c.urgent = false; c.important = false; c.follow = null;
       $('composerFollowPop').hidden = true;
